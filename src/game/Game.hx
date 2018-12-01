@@ -32,6 +32,8 @@ class Game {
         Factory.init(whiplash.Lib.phaserGame);
         whiplash.Input.setup(document.querySelector(".root"));
 
+        var e = Factory.createSky();
+        engine.addEntity(e);
         var e = Factory.createLevel();
         engine.addEntity(e);
     }

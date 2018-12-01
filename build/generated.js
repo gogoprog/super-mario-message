@@ -1241,11 +1241,21 @@ var game_Factory = function() { };
 game_Factory.__name__ = ["game","Factory"];
 game_Factory.preload = function(game1) {
 	game1.load.image("super-mario","../data/textures/super-mario.png");
+	game1.load.image("sky","../data/textures/blue-sky.png");
 	game1.load.tilemap("level","../data/tilemaps/level.json",null,Phaser.Tilemap.TILED_JSON);
+	game1.load.spritesheet("mario","../data/textures/mario-sprites.png",16,32);
+	game1.load.atlas("mario-sprites","../data/textures/mario-sprites.png","../data/textures/mario-sprites.json");
 };
 game_Factory.init = function(game1) {
 	game_Factory.tileMap = game1.add.tilemap("level");
 	game_Factory.tileMap.addTilesetImage("super-mario","super-mario");
+};
+game_Factory.createSky = function() {
+	var e = new ash_core_Entity();
+	e.add(new whiplash_phaser_Sprite("sky"));
+	e.add(new whiplash_phaser_Transform());
+	e.get(whiplash_phaser_Transform).position.y = 200;
+	return e;
 };
 game_Factory.createLevel = function() {
 	var e = new ash_core_Entity();
@@ -1270,8 +1280,10 @@ game_Game.prototype = {
 	,create: function() {
 		game_Factory.init(whiplash_Lib.phaserGame);
 		whiplash_Input.setup(window.document.querySelector(".root"));
-		var e = game_Factory.createLevel();
+		var e = game_Factory.createSky();
 		this.engine.addEntity(e);
+		var e1 = game_Factory.createLevel();
+		this.engine.addEntity(e1);
 	}
 	,update: function() {
 		var dt = whiplash_Lib.getDeltaTime() / 1000;
