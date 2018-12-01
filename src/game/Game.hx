@@ -36,6 +36,8 @@ class Game {
         engine.addEntity(e);
         var e = Factory.createLevel();
         engine.addEntity(e);
+        var e = Factory.createPlayer();
+        engine.addEntity(e);
     }
 
     function update():Void {

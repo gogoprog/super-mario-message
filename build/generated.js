@@ -1254,12 +1254,23 @@ game_Factory.createSky = function() {
 	var e = new ash_core_Entity();
 	e.add(new whiplash_phaser_Sprite("sky"));
 	e.add(new whiplash_phaser_Transform());
-	e.get(whiplash_phaser_Transform).position.y = 200;
+	e.get(whiplash_phaser_Transform).position.y = 164;
 	return e;
 };
 game_Factory.createLevel = function() {
 	var e = new ash_core_Entity();
 	e.add(new whiplash_phaser_TilemapLayer(game_Factory.tileMap,0,640,480));
+	return e;
+};
+game_Factory.createPlayer = function() {
+	var e = new ash_core_Entity();
+	var sprite = new whiplash_phaser_Sprite("mario");
+	e.add(sprite);
+	e.add(new whiplash_phaser_Transform());
+	e.get(whiplash_phaser_Transform).position.y = 164;
+	e.get(whiplash_phaser_Transform).position.x = 164;
+	sprite.animations.add("test2",[""]);
+	sprite.animations.play("test2",30,true);
 	return e;
 };
 var game_Game = function() {
@@ -1284,6 +1295,8 @@ game_Game.prototype = {
 		this.engine.addEntity(e);
 		var e1 = game_Factory.createLevel();
 		this.engine.addEntity(e1);
+		var e2 = game_Factory.createPlayer();
+		this.engine.addEntity(e2);
 	}
 	,update: function() {
 		var dt = whiplash_Lib.getDeltaTime() / 1000;

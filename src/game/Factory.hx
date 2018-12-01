@@ -23,12 +23,25 @@ class Factory {
         var e = new Entity();
         e.add(new Sprite("sky"));
         e.add(new Transform());
-        e.get(Transform).position.y = 200;
+        e.get(Transform).position.y = 164;
         return e;
     }
+
     static public function createLevel() {
         var e = new Entity();
         e.add(new TilemapLayer(tileMap, 0, 640, 480));
+        return e;
+    }
+
+    static public function createPlayer() {
+        var e = new Entity();
+        var sprite = new Sprite("mario");
+        e.add(sprite);
+        e.add(new Transform());
+        e.get(Transform).position.y = 164;
+        e.get(Transform).position.x = 164;
+        sprite.animations.add("test2", [""]);
+        sprite.animations.play('test2', 30, true);
         return e;
     }
 }
