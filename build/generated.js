@@ -1237,10 +1237,25 @@ ash_tools_ListIteratingSystem.prototype = $extend(ash_core_System.prototype,{
 	}
 	,__class__: ash_tools_ListIteratingSystem
 });
+var game_Factory = function() { };
+game_Factory.__name__ = ["game","Factory"];
+game_Factory.preload = function(game1) {
+	game1.load.image("super-mario","../data/textures/super-mario.png");
+	game1.load.tilemap("level","../data/tilemaps/level.json",null,Phaser.Tilemap.TILED_JSON);
+};
+game_Factory.init = function(game1) {
+	game_Factory.tileMap = game1.add.tilemap("level");
+	game_Factory.tileMap.addTilesetImage("super-mario","super-mario");
+};
+game_Factory.createLevel = function() {
+	var e = new ash_core_Entity();
+	e.add(new whiplash_phaser_TilemapLayer(game_Factory.tileMap,0,640,480));
+	return e;
+};
 var game_Game = function() {
 	var _gthis = this;
 	$(window).on("load",null,function() {
-		whiplash_Lib.init(null,null,null,{ preload : $bind(_gthis,_gthis.preload), create : $bind(_gthis,_gthis.create), update : $bind(_gthis,_gthis.update)});
+		whiplash_Lib.init(640,480,".root",{ preload : $bind(_gthis,_gthis.preload), create : $bind(_gthis,_gthis.create), update : $bind(_gthis,_gthis.update)});
 		_gthis.engine = whiplash_Lib.ashEngine;
 	});
 };
@@ -1250,9 +1265,13 @@ game_Game.main = function() {
 };
 game_Game.prototype = {
 	preload: function() {
+		game_Factory.preload(whiplash_Lib.phaserGame);
 	}
 	,create: function() {
-		whiplash_Input.setup(window.document.querySelector("body"));
+		game_Factory.init(whiplash_Lib.phaserGame);
+		whiplash_Input.setup(window.document.querySelector(".root"));
+		var e = game_Factory.createLevel();
+		this.engine.addEntity(e);
 	}
 	,update: function() {
 		var dt = whiplash_Lib.getDeltaTime() / 1000;

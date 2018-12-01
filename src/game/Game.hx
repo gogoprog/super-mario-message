@@ -19,16 +19,21 @@ class Game {
 
     public function new() {
         new JQuery(window).on("load", function() {
-            whiplash.Lib.init(640, 480, "body", {preload:preload, create:create, update:update});
+            whiplash.Lib.init(640, 480, ".root", {preload:preload, create:create, update:update});
             engine = whiplash.Lib.ashEngine;
         });
     }
 
     function preload():Void {
+        Factory.preload(whiplash.Lib.phaserGame);
     }
 
     function create():Void {
+        Factory.init(whiplash.Lib.phaserGame);
         whiplash.Input.setup(document.querySelector(".root"));
+
+        var e = Factory.createLevel();
+        engine.addEntity(e);
     }
 
     function update():Void {
