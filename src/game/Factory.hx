@@ -11,6 +11,7 @@ class Factory {
         game.load.image("sky", "../data/textures/blue-sky.png");
         game.load.tilemap("level", cast "../data/tilemaps/level.json", cast null, cast phaser.Tilemap.TILED_JSON);
         game.load.atlas('mario-sprites', '../data/textures/mario-sprites.png', '../data/textures/mario-sprites.json');
+        game.load.spritesheet('level-sheet', '../data/textures/super-mario.png', 16, 16, 128, 1, 2);
     }
 
     static public function init(game:phaser.Game) {
@@ -41,6 +42,13 @@ class Factory {
         sprite.animations.add("idle", ["mario/stand"]);
         sprite.animations.add("walk", [for(i in 1...4) "mario/walk" + i]);
         sprite.animations.play('walk', 15, true);
+        return e;
+    }
+
+    static public function createBlock() {
+        var e = new Entity();
+        e.add(new Transform());
+        e.add(new Sprite("level-sheet", 13));
         return e;
     }
 }

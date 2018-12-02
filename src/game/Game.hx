@@ -52,6 +52,10 @@ class Game {
         untyped playerSprite.body.collideWorldBounds = true;
         untyped playerSprite.body.setSize(16, 16);
         game.camera.follow(playerSprite);
+
+        var e = Factory.createBlock();
+        engine.addEntity(e);
+        e.get(Transform).position.set(20, 20);
     }
 
     function update():Void {
