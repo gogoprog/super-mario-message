@@ -1265,8 +1265,8 @@ game_Factory.createPlayer = function() {
 	var sprite = new whiplash_phaser_Sprite("mario-sprites");
 	e.add(sprite);
 	e.add(new whiplash_phaser_Transform());
-	e.get(whiplash_phaser_Transform).position.y = 164;
-	e.get(whiplash_phaser_Transform).position.x = 164;
+	e.get(whiplash_phaser_Transform).position.y = 0;
+	e.get(whiplash_phaser_Transform).position.x = 16;
 	sprite.animations.add("idle",["mario/stand"]);
 	var sprite1 = sprite.animations;
 	var _g = [];
@@ -1297,10 +1297,10 @@ game_Game.prototype = {
 	,create: function() {
 		var game1 = whiplash_Lib.phaserGame;
 		game_Factory.init(game1);
-		whiplash_Input.setup(window.document.querySelector(".root"));
+		whiplash_Input.setup(window.document.querySelector("canvas"));
 		game1.world.setBounds(0,0,760,210);
 		game1.physics.startSystem(Phaser.Physics.ARCADE);
-		game1.time.desiredFps = 30;
+		game1.time.desiredFps = 60;
 		game1.physics.arcade.gravity.y = 250;
 		var e = game_Factory.createSky();
 		this.engine.addEntity(e);
@@ -1308,17 +1308,27 @@ game_Game.prototype = {
 		this.engine.addEntity(e1);
 		var e2 = game_Factory.createPlayer();
 		this.engine.addEntity(e2);
-		var playerSprite = e2.get(whiplash_phaser_Sprite);
-		game1.physics.enable(playerSprite,Phaser.Physics.ARCADE);
-		playerSprite.body.bounce.y = 0.2;
-		playerSprite.body.collideWorldBounds = true;
-		playerSprite.body.setSize(16,16);
-		playerSprite.body.velocity.x = 100;
-		game1.camera.follow(playerSprite);
+		this.playerEntity = e2;
+		this.playerSprite = e2.get(whiplash_phaser_Sprite);
+		game1.physics.enable(this.playerSprite,Phaser.Physics.ARCADE);
+		this.playerSprite.body.collideWorldBounds = true;
+		this.playerSprite.body.setSize(16,16);
+		game1.camera.follow(this.playerSprite);
 	}
 	,update: function() {
+		var game1 = whiplash_Lib.phaserGame;
+		var mouseCoords = whiplash_Input.mouseCoordinates;
 		var dt = whiplash_Lib.getDeltaTime() / 1000;
 		this.engine.update(dt);
+		var mx = game1.camera.x + mouseCoords.x * 0.5;
+		if(this.playerSprite.position.x > mx) {
+			this.playerSprite.body.velocity.x = -100;
+		} else {
+			this.playerSprite.body.velocity.x = 100;
+		}
+		if(game1.input.mousePointer.isDown) {
+			this.playerSprite.body.velocity.y = -125;
+		}
 	}
 	,__class__: game_Game
 };

@@ -16,6 +16,8 @@ import whiplash.common.components.Active;
 
 class Game {
     var engine:ash.core.Engine;
+    var playerSprite:Sprite;
+    var playerEntity:Entity;
 
     public function new() {
         new JQuery(window).on("load", function() {
@@ -31,10 +33,10 @@ class Game {
     function create():Void {
         var game = whiplash.Lib.phaserGame;
         Factory.init(game);
-        whiplash.Input.setup(document.querySelector(".root"));
+        whiplash.Input.setup(document.querySelector("canvas"));
         game.world.setBounds(0, 0, 760, 14*15);
         game.physics.startSystem(phaser.Physics.ARCADE);
-        game.time.desiredFps = 30;
+        game.time.desiredFps = 60;
         game.physics.arcade.gravity.y = 250;
 
         var e = Factory.createSky();
@@ -43,20 +45,32 @@ class Game {
         engine.addEntity(e);
         var e = Factory.createPlayer();
         engine.addEntity(e);
-        var playerSprite = e.get(Sprite);
+        playerEntity = e;
+        playerSprite = e.get(Sprite);
 
         game.physics.enable(playerSprite, phaser.Physics.ARCADE);
-        untyped playerSprite.body.bounce.y = 0.2;
         untyped playerSprite.body.collideWorldBounds = true;
         untyped playerSprite.body.setSize(16, 16);
-        untyped playerSprite.body.velocity.x = 100;
         game.camera.follow(playerSprite);
     }
 
     function update():Void {
+        var game = whiplash.Lib.phaserGame;
+        var mouseCoords = whiplash.Input.mouseCoordinates;
         var dt = whiplash.Lib.getDeltaTime() / 1000;
         engine.update(dt);
-        // whiplash.Lib.phaserGame.camera.x += dt * 100;
+
+        var mx = game.camera.x + mouseCoords.x * 0.5;
+
+        if(playerSprite.position.x > mx) {
+            untyped playerSprite.body.velocity.x = -100;
+        } else {
+            untyped playerSprite.body.velocity.x = 100;
+        }
+
+        if(game.input.mousePointer.isDown) {
+            untyped playerSprite.body.velocity.y = -125;
+        }
     }
 
     static function main():Void {
