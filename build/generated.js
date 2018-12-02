@@ -1243,7 +1243,6 @@ game_Factory.preload = function(game1) {
 	game1.load.image("super-mario","../data/textures/super-mario.png");
 	game1.load.image("sky","../data/textures/blue-sky.png");
 	game1.load.tilemap("level","../data/tilemaps/level.json",null,Phaser.Tilemap.TILED_JSON);
-	game1.load.spritesheet("mario","../data/textures/mario-sprites.png",16,32);
 	game1.load.atlas("mario-sprites","../data/textures/mario-sprites.png","../data/textures/mario-sprites.json");
 };
 game_Factory.init = function(game1) {
@@ -1254,7 +1253,6 @@ game_Factory.createSky = function() {
 	var e = new ash_core_Entity();
 	e.add(new whiplash_phaser_Sprite("sky"));
 	e.add(new whiplash_phaser_Transform());
-	e.get(whiplash_phaser_Transform).position.y = 164;
 	return e;
 };
 game_Factory.createLevel = function() {
@@ -1264,19 +1262,27 @@ game_Factory.createLevel = function() {
 };
 game_Factory.createPlayer = function() {
 	var e = new ash_core_Entity();
-	var sprite = new whiplash_phaser_Sprite("mario");
+	var sprite = new whiplash_phaser_Sprite("mario-sprites");
 	e.add(sprite);
 	e.add(new whiplash_phaser_Transform());
 	e.get(whiplash_phaser_Transform).position.y = 164;
 	e.get(whiplash_phaser_Transform).position.x = 164;
-	sprite.animations.add("test2",[""]);
-	sprite.animations.play("test2",30,true);
+	sprite.animations.add("idle",["mario/stand"]);
+	var sprite1 = sprite.animations;
+	var _g = [];
+	var _g1 = 1;
+	while(_g1 < 4) {
+		var i = _g1++;
+		_g.push("mario/walk" + i);
+	}
+	sprite1.add("walk",_g);
+	sprite.animations.play("walk",15,true);
 	return e;
 };
 var game_Game = function() {
 	var _gthis = this;
 	$(window).on("load",null,function() {
-		whiplash_Lib.init(640,480,".root",{ preload : $bind(_gthis,_gthis.preload), create : $bind(_gthis,_gthis.create), update : $bind(_gthis,_gthis.update)});
+		whiplash_Lib.init(320,240,".root",{ preload : $bind(_gthis,_gthis.preload), create : $bind(_gthis,_gthis.create), update : $bind(_gthis,_gthis.update)});
 		_gthis.engine = whiplash_Lib.ashEngine;
 	});
 };
@@ -1289,21 +1295,30 @@ game_Game.prototype = {
 		game_Factory.preload(whiplash_Lib.phaserGame);
 	}
 	,create: function() {
-		game_Factory.init(whiplash_Lib.phaserGame);
+		var game1 = whiplash_Lib.phaserGame;
+		game_Factory.init(game1);
 		whiplash_Input.setup(window.document.querySelector(".root"));
+		game1.world.setBounds(0,0,760,210);
+		game1.physics.startSystem(Phaser.Physics.ARCADE);
+		game1.time.desiredFps = 30;
+		game1.physics.arcade.gravity.y = 250;
 		var e = game_Factory.createSky();
 		this.engine.addEntity(e);
 		var e1 = game_Factory.createLevel();
 		this.engine.addEntity(e1);
 		var e2 = game_Factory.createPlayer();
 		this.engine.addEntity(e2);
+		var playerSprite = e2.get(whiplash_phaser_Sprite);
+		game1.physics.enable(playerSprite,Phaser.Physics.ARCADE);
+		playerSprite.body.bounce.y = 0.2;
+		playerSprite.body.collideWorldBounds = true;
+		playerSprite.body.setSize(16,16);
+		playerSprite.body.velocity.x = 100;
+		game1.camera.follow(playerSprite);
 	}
 	,update: function() {
 		var dt = whiplash_Lib.getDeltaTime() / 1000;
 		this.engine.update(dt);
-		if(whiplash_Input.mouseButtons.h[0]) {
-			console.log(whiplash_Input.mouseCoordinates);
-		}
 	}
 	,__class__: game_Game
 };
@@ -2134,22 +2149,38 @@ whiplash_phaser_SpriteSystem.prototype = $extend(ash_tools_ListIteratingSystem.p
 		var position = transform.position;
 		var scale = transform.scale;
 		var sprite = node.sprite;
-		sprite.position.x = position.x;
-		sprite.position.y = position.y;
-		sprite.scale.x = scale.x;
-		sprite.scale.y = scale.y;
-		sprite.angle = transform.rotation;
+		if(sprite.body && !sprite.body.immovable) {
+			position.x = sprite.position.x;
+			position.y = sprite.position.y;
+			scale.x = sprite.scale.x;
+			scale.y = sprite.scale.y;
+			transform.rotation = sprite.angle;
+		} else {
+			sprite.position.x = position.x;
+			sprite.position.y = position.y;
+			sprite.scale.x = scale.x;
+			sprite.scale.y = scale.y;
+			sprite.angle = transform.rotation;
+		}
 	}
 	,onNodeAdded: function(node) {
 		var transform = node.transform;
 		var position = transform.position;
 		var scale = transform.scale;
 		var sprite = node.sprite;
-		sprite.position.x = position.x;
-		sprite.position.y = position.y;
-		sprite.scale.x = scale.x;
-		sprite.scale.y = scale.y;
-		sprite.angle = transform.rotation;
+		if(sprite.body && !sprite.body.immovable) {
+			position.x = sprite.position.x;
+			position.y = sprite.position.y;
+			scale.x = sprite.scale.x;
+			scale.y = sprite.scale.y;
+			transform.rotation = sprite.angle;
+		} else {
+			sprite.position.x = position.x;
+			sprite.position.y = position.y;
+			sprite.scale.x = scale.x;
+			sprite.scale.y = scale.y;
+			sprite.angle = transform.rotation;
+		}
 		node.sprite.revive();
 	}
 	,onNodeRemoved: function(node) {
@@ -2160,11 +2191,19 @@ whiplash_phaser_SpriteSystem.prototype = $extend(ash_tools_ListIteratingSystem.p
 		var position = transform.position;
 		var scale = transform.scale;
 		var sprite = node.sprite;
-		sprite.position.x = position.x;
-		sprite.position.y = position.y;
-		sprite.scale.x = scale.x;
-		sprite.scale.y = scale.y;
-		sprite.angle = transform.rotation;
+		if(sprite.body && !sprite.body.immovable) {
+			position.x = sprite.position.x;
+			position.y = sprite.position.y;
+			scale.x = sprite.scale.x;
+			scale.y = sprite.scale.y;
+			transform.rotation = sprite.angle;
+		} else {
+			sprite.position.x = position.x;
+			sprite.position.y = position.y;
+			sprite.scale.x = scale.x;
+			sprite.scale.y = scale.y;
+			sprite.angle = transform.rotation;
+		}
 	}
 	,__class__: whiplash_phaser_SpriteSystem
 });
