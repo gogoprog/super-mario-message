@@ -52,7 +52,7 @@ class Game {
 
         game.physics.enable(playerSprite, phaser.Physics.ARCADE);
         untyped playerSprite.body.collideWorldBounds = true;
-        untyped playerSprite.body.setSize(16, 16);
+        untyped playerSprite.body.setSize(14, 14);
         game.camera.follow(playerSprite);
 
         var es = Factory.createBlocks("Name: [gogoprog]\nThats it\noh yeah");

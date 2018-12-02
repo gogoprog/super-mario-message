@@ -57,6 +57,7 @@ class Factory {
         whiplash.Lib.phaserGame.physics.enable(sprite, phaser.Physics.ARCADE);
         untyped sprite.body.setSize(16, 16);
         untyped sprite.body.immovable = true;
+        untyped sprite.body.moves = false;
         return e;
     }
 

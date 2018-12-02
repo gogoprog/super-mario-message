@@ -1294,6 +1294,7 @@ game_Factory.createLetterBlock = function(letter) {
 	whiplash_Lib.phaserGame.physics.enable(sprite,Phaser.Physics.ARCADE);
 	sprite.body.setSize(16,16);
 	sprite.body.immovable = true;
+	sprite.body.moves = false;
 	return e;
 };
 game_Factory.createQuestionBlock = function() {
@@ -1372,7 +1373,7 @@ game_Game.prototype = {
 		this.playerSprite = e2.get(whiplash_phaser_Sprite);
 		game1.physics.enable(this.playerSprite,Phaser.Physics.ARCADE);
 		this.playerSprite.body.collideWorldBounds = true;
-		this.playerSprite.body.setSize(16,16);
+		this.playerSprite.body.setSize(14,14);
 		game1.camera.follow(this.playerSprite);
 		var es = game_Factory.createBlocks("Name: [gogoprog]\nThats it\noh yeah");
 		this.blockSprites = [];
@@ -2339,6 +2340,11 @@ whiplash_phaser_SpriteSystem.prototype = $extend(ash_tools_ListIteratingSystem.p
 				sprite.body.position.x = position.x;
 				sprite.body.position.y = position.y;
 				sprite.body.angle = transform.rotation;
+				sprite.position.x = position.x;
+				sprite.position.y = position.y;
+				sprite.scale.x = scale.x;
+				sprite.scale.y = scale.y;
+				sprite.angle = transform.rotation;
 			}
 		} else {
 			sprite.position.x = position.x;
@@ -2364,6 +2370,11 @@ whiplash_phaser_SpriteSystem.prototype = $extend(ash_tools_ListIteratingSystem.p
 				sprite.body.position.x = position.x;
 				sprite.body.position.y = position.y;
 				sprite.body.angle = transform.rotation;
+				sprite.position.x = position.x;
+				sprite.position.y = position.y;
+				sprite.scale.x = scale.x;
+				sprite.scale.y = scale.y;
+				sprite.angle = transform.rotation;
 			}
 		} else {
 			sprite.position.x = position.x;
@@ -2393,6 +2404,11 @@ whiplash_phaser_SpriteSystem.prototype = $extend(ash_tools_ListIteratingSystem.p
 				sprite.body.position.x = position.x;
 				sprite.body.position.y = position.y;
 				sprite.body.angle = transform.rotation;
+				sprite.position.x = position.x;
+				sprite.position.y = position.y;
+				sprite.scale.x = scale.x;
+				sprite.scale.y = scale.y;
+				sprite.angle = transform.rotation;
 			}
 		} else {
 			sprite.position.x = position.x;
