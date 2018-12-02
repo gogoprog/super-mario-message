@@ -17,6 +17,7 @@ import whiplash.common.components.Active;
 class Game {
     var engine:ash.core.Engine;
     var playerSprite:Sprite;
+    var blockSprites:Array<Sprite>;
     var playerEntity:Entity;
 
     public function new() {
@@ -32,6 +33,7 @@ class Game {
 
     function create():Void {
         var game = whiplash.Lib.phaserGame;
+        game.stage.smoothed = false;
         Factory.init(game);
         whiplash.Input.setup(document.querySelector("canvas"));
         game.world.setBounds(0, 0, 760, 14*15);
@@ -53,10 +55,11 @@ class Game {
         untyped playerSprite.body.setSize(16, 16);
         game.camera.follow(playerSprite);
 
-
         var es = Factory.createBlocks("Name: [gogoprog]\nThats it\noh yeah");
+        blockSprites = [];
         for(e in es) {
             engine.addEntity(e);
+            blockSprites.push(e.get(Sprite));
         }
     }
 
@@ -77,6 +80,7 @@ class Game {
         if(game.input.mousePointer.isDown) {
             untyped playerSprite.body.velocity.y = -125;
         }
+        game.physics.arcade.collide(playerSprite, blockSprites);
     }
 
     static function main():Void {

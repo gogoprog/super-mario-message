@@ -1247,6 +1247,7 @@ game_Factory.preload = function(game1) {
 	game1.load.tilemap("level","../data/tilemaps/level.json",null,Phaser.Tilemap.TILED_JSON);
 	game1.load.atlas("mario-sprites","../data/textures/mario-sprites.png","../data/textures/mario-sprites.json");
 	game1.load.spritesheet("level-sheet","../data/textures/super-mario.png",16,16,128,1,2);
+	game1.load.bitmapFont("font","../data/fonts/font.png","../data/fonts/font.fnt");
 };
 game_Factory.init = function(game1) {
 	game_Factory.tileMap = game1.add.tilemap("level");
@@ -1286,17 +1287,13 @@ game_Factory.createLetterBlock = function(letter) {
 	var e = new ash_core_Entity();
 	e.add(new whiplash_phaser_Transform());
 	e.add(new whiplash_phaser_Sprite("level-sheet",43));
-	e.add(new whiplash_phaser_Text(letter));
-	var text = e.get(whiplash_phaser_Text);
-	text.anchor.set(0,0);
-	text.align = "center";
-	text.font = "Arial Black";
-	text.fontSize = 12;
-	text.fontWeight = "bold";
-	text.stroke = "#000000";
-	text.strokeThickness = 2;
-	text.fill = "white";
-	text.addStrokeColor("#000000",0);
+	e.add(new whiplash_phaser_BitmapText("font",letter.toUpperCase(),12));
+	e.get(whiplash_phaser_BitmapText).anchor.set(-0.2,-0.2);
+	e.get(whiplash_phaser_BitmapText).smoothed = false;
+	var sprite = e.get(whiplash_phaser_Sprite);
+	whiplash_Lib.phaserGame.physics.enable(sprite,Phaser.Physics.ARCADE);
+	sprite.body.setSize(16,16);
+	sprite.body.immovable = true;
 	return e;
 };
 game_Factory.createQuestionBlock = function() {
@@ -1358,6 +1355,7 @@ game_Game.prototype = {
 	}
 	,create: function() {
 		var game1 = whiplash_Lib.phaserGame;
+		game1.stage.smoothed = false;
 		game_Factory.init(game1);
 		whiplash_Input.setup(window.document.querySelector("canvas"));
 		game1.world.setBounds(0,0,760,210);
@@ -1377,11 +1375,13 @@ game_Game.prototype = {
 		this.playerSprite.body.setSize(16,16);
 		game1.camera.follow(this.playerSprite);
 		var es = game_Factory.createBlocks("Name: [gogoprog]\nThats it\noh yeah");
+		this.blockSprites = [];
 		var _g = 0;
 		while(_g < es.length) {
 			var e3 = es[_g];
 			++_g;
 			this.engine.addEntity(e3);
+			this.blockSprites.push(e3.get(whiplash_phaser_Sprite));
 		}
 	}
 	,update: function() {
@@ -1398,6 +1398,7 @@ game_Game.prototype = {
 		if(game1.input.mousePointer.isDown) {
 			this.playerSprite.body.velocity.y = -125;
 		}
+		game1.physics.arcade.collide(this.playerSprite,this.blockSprites);
 	}
 	,__class__: game_Game
 };
@@ -1980,6 +1981,7 @@ whiplash_Lib.init = function(width,height,parent,callbacks,options,systemsPriori
 	whiplash_Lib.ashEngine.addSystem(new whiplash_phaser_TileSpriteSystem(whiplash_Lib.phaserGame),systemsPriority);
 	whiplash_Lib.ashEngine.addSystem(new whiplash_phaser_TilemapLayerSystem(whiplash_Lib.phaserGame),systemsPriority);
 	whiplash_Lib.ashEngine.addSystem(new whiplash_phaser_TextSystem(whiplash_Lib.phaserGame),systemsPriority);
+	whiplash_Lib.ashEngine.addSystem(new whiplash_phaser_BitmapTextSystem(whiplash_Lib.phaserGame),systemsPriority);
 	whiplash_Lib.ashEngine.addSystem(new whiplash_phaser_GraphicsSystem(whiplash_Lib.phaserGame),systemsPriority);
 };
 var whiplash_common_components_Active = function() {
@@ -2066,6 +2068,104 @@ whiplash_math__$Vector2_Vector2_$Impl_$.getAngle = function(this1) {
 whiplash_math__$Vector2_Vector2_$Impl_$.getLength = function(this1) {
 	return Math.sqrt(this1.x * this1.x + this1.y * this1.y);
 };
+var whiplash_phaser_BitmapText = function(font,text,size) {
+	Phaser.BitmapText.call(this,whiplash_Lib.phaserGame,0,0,font,text,size);
+	whiplash_Lib.phaserGame.add.existing(this);
+	this.kill();
+};
+whiplash_phaser_BitmapText.__name__ = ["whiplash","phaser","BitmapText"];
+whiplash_phaser_BitmapText.__super__ = Phaser.BitmapText;
+whiplash_phaser_BitmapText.prototype = $extend(Phaser.BitmapText.prototype,{
+	__class__: whiplash_phaser_BitmapText
+});
+var whiplash_phaser_BitmapTextNode = function() { };
+whiplash_phaser_BitmapTextNode.__name__ = ["whiplash","phaser","BitmapTextNode"];
+whiplash_phaser_BitmapTextNode._getComponents = function() {
+	if(whiplash_phaser_BitmapTextNode._components == null) {
+		whiplash_phaser_BitmapTextNode._components = new ash_ClassMap();
+		var _this = whiplash_phaser_BitmapTextNode._components;
+		var k = whiplash_phaser_Transform;
+		var name = Type.getClassName(k);
+		var _this1 = _this.keyMap;
+		if(__map_reserved[name] != null) {
+			_this1.setReserved(name,k);
+		} else {
+			_this1.h[name] = k;
+		}
+		var _this2 = _this.valueMap;
+		if(__map_reserved[name] != null) {
+			_this2.setReserved(name,"transform");
+		} else {
+			_this2.h[name] = "transform";
+		}
+		var _this3 = whiplash_phaser_BitmapTextNode._components;
+		var k1 = whiplash_phaser_BitmapText;
+		var name1 = Type.getClassName(k1);
+		var _this4 = _this3.keyMap;
+		if(__map_reserved[name1] != null) {
+			_this4.setReserved(name1,k1);
+		} else {
+			_this4.h[name1] = k1;
+		}
+		var _this5 = _this3.valueMap;
+		if(__map_reserved[name1] != null) {
+			_this5.setReserved(name1,"sprite");
+		} else {
+			_this5.h[name1] = "sprite";
+		}
+	}
+	return whiplash_phaser_BitmapTextNode._components;
+};
+whiplash_phaser_BitmapTextNode.__super__ = ash_core_Node;
+whiplash_phaser_BitmapTextNode.prototype = $extend(ash_core_Node.prototype,{
+	__class__: whiplash_phaser_BitmapTextNode
+});
+var whiplash_phaser_BitmapTextSystem = function(game) {
+	ash_tools_ListIteratingSystem.call(this,whiplash_phaser_BitmapTextNode,$bind(this,this.updateNode),$bind(this,this.onNodeAdded),$bind(this,this.onNodeRemoved));
+	this.game = game;
+};
+whiplash_phaser_BitmapTextSystem.__name__ = ["whiplash","phaser","BitmapTextSystem"];
+whiplash_phaser_BitmapTextSystem.__super__ = ash_tools_ListIteratingSystem;
+whiplash_phaser_BitmapTextSystem.prototype = $extend(ash_tools_ListIteratingSystem.prototype,{
+	updateNode: function(node,dt) {
+		var transform = node.transform;
+		var position = transform.position;
+		var scale = transform.scale;
+		var sprite = node.sprite;
+		sprite.position.x = position.x;
+		sprite.position.y = position.y;
+		sprite.scale.x = scale.x;
+		sprite.scale.y = scale.y;
+		sprite.angle = transform.rotation;
+	}
+	,onNodeAdded: function(node) {
+		var transform = node.transform;
+		var position = transform.position;
+		var scale = transform.scale;
+		var sprite = node.sprite;
+		sprite.position.x = position.x;
+		sprite.position.y = position.y;
+		sprite.scale.x = scale.x;
+		sprite.scale.y = scale.y;
+		sprite.angle = transform.rotation;
+		node.sprite.revive();
+	}
+	,onNodeRemoved: function(node) {
+		node.sprite.kill();
+	}
+	,apply: function(node) {
+		var transform = node.transform;
+		var position = transform.position;
+		var scale = transform.scale;
+		var sprite = node.sprite;
+		sprite.position.x = position.x;
+		sprite.position.y = position.y;
+		sprite.scale.x = scale.x;
+		sprite.scale.y = scale.y;
+		sprite.angle = transform.rotation;
+	}
+	,__class__: whiplash_phaser_BitmapTextSystem
+});
 var whiplash_phaser_Graphics = function() {
 	Phaser.Graphics.call(this,whiplash_Lib.phaserGame,0,0);
 	whiplash_Lib.phaserGame.add.existing(this);
@@ -2228,12 +2328,18 @@ whiplash_phaser_SpriteSystem.prototype = $extend(ash_tools_ListIteratingSystem.p
 		var position = transform.position;
 		var scale = transform.scale;
 		var sprite = node.sprite;
-		if(sprite.body && !sprite.body.immovable) {
-			position.x = sprite.position.x;
-			position.y = sprite.position.y;
-			scale.x = sprite.scale.x;
-			scale.y = sprite.scale.y;
-			transform.rotation = sprite.angle;
+		if(sprite.body) {
+			if(!sprite.body.immovable) {
+				position.x = sprite.position.x;
+				position.y = sprite.position.y;
+				scale.x = sprite.scale.x;
+				scale.y = sprite.scale.y;
+				transform.rotation = sprite.angle;
+			} else {
+				sprite.body.position.x = position.x;
+				sprite.body.position.y = position.y;
+				sprite.body.angle = transform.rotation;
+			}
 		} else {
 			sprite.position.x = position.x;
 			sprite.position.y = position.y;
@@ -2247,12 +2353,18 @@ whiplash_phaser_SpriteSystem.prototype = $extend(ash_tools_ListIteratingSystem.p
 		var position = transform.position;
 		var scale = transform.scale;
 		var sprite = node.sprite;
-		if(sprite.body && !sprite.body.immovable) {
-			position.x = sprite.position.x;
-			position.y = sprite.position.y;
-			scale.x = sprite.scale.x;
-			scale.y = sprite.scale.y;
-			transform.rotation = sprite.angle;
+		if(sprite.body) {
+			if(!sprite.body.immovable) {
+				position.x = sprite.position.x;
+				position.y = sprite.position.y;
+				scale.x = sprite.scale.x;
+				scale.y = sprite.scale.y;
+				transform.rotation = sprite.angle;
+			} else {
+				sprite.body.position.x = position.x;
+				sprite.body.position.y = position.y;
+				sprite.body.angle = transform.rotation;
+			}
 		} else {
 			sprite.position.x = position.x;
 			sprite.position.y = position.y;
@@ -2270,12 +2382,18 @@ whiplash_phaser_SpriteSystem.prototype = $extend(ash_tools_ListIteratingSystem.p
 		var position = transform.position;
 		var scale = transform.scale;
 		var sprite = node.sprite;
-		if(sprite.body && !sprite.body.immovable) {
-			position.x = sprite.position.x;
-			position.y = sprite.position.y;
-			scale.x = sprite.scale.x;
-			scale.y = sprite.scale.y;
-			transform.rotation = sprite.angle;
+		if(sprite.body) {
+			if(!sprite.body.immovable) {
+				position.x = sprite.position.x;
+				position.y = sprite.position.y;
+				scale.x = sprite.scale.x;
+				scale.y = sprite.scale.y;
+				transform.rotation = sprite.angle;
+			} else {
+				sprite.body.position.x = position.x;
+				sprite.body.position.y = position.y;
+				sprite.body.angle = transform.rotation;
+			}
 		} else {
 			sprite.position.x = position.x;
 			sprite.position.y = position.y;

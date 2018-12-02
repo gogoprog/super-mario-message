@@ -12,6 +12,7 @@ class Factory {
         game.load.tilemap("level", cast "../data/tilemaps/level.json", cast null, cast phaser.Tilemap.TILED_JSON);
         game.load.atlas('mario-sprites', '../data/textures/mario-sprites.png', '../data/textures/mario-sprites.json');
         game.load.spritesheet('level-sheet', '../data/textures/super-mario.png', 16, 16, 128, 1, 2);
+        game.load.bitmapFont('font', '../data/fonts/font.png', '../data/fonts/font.fnt');
     }
 
     static public function init(game:phaser.Game) {
@@ -49,17 +50,13 @@ class Factory {
         var e = new Entity();
         e.add(new Transform());
         e.add(new Sprite("level-sheet", 43));
-        e.add(new Text(letter));
-        var text = e.get(Text);
-        text.anchor.set(0, 0);
-        text.align = 'center';
-        text.font = 'Arial Black';
-        text.fontSize = 12;
-        text.fontWeight = 'bold';
-        text.stroke = '#000000';
-        text.strokeThickness = 2;
-        text.fill = 'white';
-        text.addStrokeColor('#000000', 0);
+        e.add(new BitmapText("font", letter.toUpperCase(), 12));
+        e.get(BitmapText).anchor.set(-0.2, -0.2);
+        e.get(BitmapText).smoothed = false;
+        var sprite = e.get(Sprite);
+        whiplash.Lib.phaserGame.physics.enable(sprite, phaser.Physics.ARCADE);
+        untyped sprite.body.setSize(16, 16);
+        untyped sprite.body.immovable = true;
         return e;
     }
 
@@ -92,7 +89,7 @@ class Factory {
                     default:
                         var e:Entity;
                         e = isHidden ? createQuestionBlock() : createLetterBlock(char);
-                        e.get(Transform).position.set(x + advance *Config.blockSize, y);
+                        e.get(Transform).position.set(x + advance * Config.blockSize, y);
                         result.push(e);
                         advance++;
                 }
