@@ -1237,6 +1237,8 @@ ash_tools_ListIteratingSystem.prototype = $extend(ash_core_System.prototype,{
 	}
 	,__class__: ash_tools_ListIteratingSystem
 });
+var game_Config = function() { };
+game_Config.__name__ = ["game","Config"];
 var game_Factory = function() { };
 game_Factory.__name__ = ["game","Factory"];
 game_Factory.preload = function(game1) {
@@ -1280,11 +1282,64 @@ game_Factory.createPlayer = function() {
 	sprite.animations.play("walk",15,true);
 	return e;
 };
-game_Factory.createBlock = function() {
+game_Factory.createLetterBlock = function(letter) {
+	var e = new ash_core_Entity();
+	e.add(new whiplash_phaser_Transform());
+	e.add(new whiplash_phaser_Sprite("level-sheet",43));
+	e.add(new whiplash_phaser_Text(letter));
+	var text = e.get(whiplash_phaser_Text);
+	text.anchor.set(0,0);
+	text.align = "center";
+	text.font = "Arial Black";
+	text.fontSize = 12;
+	text.fontWeight = "bold";
+	text.stroke = "#000000";
+	text.strokeThickness = 2;
+	text.fill = "white";
+	text.addStrokeColor("#000000",0);
+	return e;
+};
+game_Factory.createQuestionBlock = function() {
 	var e = new ash_core_Entity();
 	e.add(new whiplash_phaser_Transform());
 	e.add(new whiplash_phaser_Sprite("level-sheet",13));
 	return e;
+};
+game_Factory.createBlocks = function(input) {
+	var result = [];
+	var lines = input.split("\n");
+	var i = lines.length - 1;
+	while(i >= 0) {
+		var p = lines.length - i - 1;
+		var x = game_Config.firstCol * game_Config.blockSize;
+		var y = (game_Config.height - game_Config.firstRow) * game_Config.blockSize - p * game_Config.lineSpacing * game_Config.blockSize;
+		var advance = 0;
+		var isHidden = false;
+		var _g1 = 0;
+		var _g = lines[i].length;
+		while(_g1 < _g) {
+			var c = _g1++;
+			var $char = lines[i].charAt(c);
+			switch($char) {
+			case " ":
+				++advance;
+				break;
+			case "[":
+				isHidden = true;
+				break;
+			case "]":
+				isHidden = false;
+				break;
+			default:
+				var e = isHidden ? game_Factory.createQuestionBlock() : game_Factory.createLetterBlock($char);
+				e.get(whiplash_phaser_Transform).position.set(x + advance * game_Config.blockSize,y);
+				result.push(e);
+				++advance;
+			}
+		}
+		--i;
+	}
+	return result;
 };
 var game_Game = function() {
 	var _gthis = this;
@@ -1321,9 +1376,13 @@ game_Game.prototype = {
 		this.playerSprite.body.collideWorldBounds = true;
 		this.playerSprite.body.setSize(16,16);
 		game1.camera.follow(this.playerSprite);
-		var e3 = game_Factory.createBlock();
-		this.engine.addEntity(e3);
-		e3.get(whiplash_phaser_Transform).position.set(20,20);
+		var es = game_Factory.createBlocks("Name: [gogoprog]\nThats it\noh yeah");
+		var _g = 0;
+		while(_g < es.length) {
+			var e3 = es[_g];
+			++_g;
+			this.engine.addEntity(e3);
+		}
 	}
 	,update: function() {
 		var game1 = whiplash_Lib.phaserGame;
@@ -2531,6 +2590,11 @@ var Class = { __name__ : ["Class"]};
 var Enum = { };
 var __map_reserved = {};
 ash_core_Entity.nameCount = 0;
+game_Config.firstCol = 4;
+game_Config.firstRow = 6;
+game_Config.lineSpacing = 3;
+game_Config.blockSize = 16;
+game_Config.height = 15;
 haxe_ds_ObjectMap.count = 0;
 js_Boot.__toStr = ({ }).toString;
 whiplash_Input.keys = new haxe_ds_StringMap();

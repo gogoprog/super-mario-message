@@ -45,10 +45,60 @@ class Factory {
         return e;
     }
 
-    static public function createBlock() {
+    static public function createLetterBlock(letter) {
+        var e = new Entity();
+        e.add(new Transform());
+        e.add(new Sprite("level-sheet", 43));
+        e.add(new Text(letter));
+        var text = e.get(Text);
+        text.anchor.set(0, 0);
+        text.align = 'center';
+        text.font = 'Arial Black';
+        text.fontSize = 12;
+        text.fontWeight = 'bold';
+        text.stroke = '#000000';
+        text.strokeThickness = 2;
+        text.fill = 'white';
+        text.addStrokeColor('#000000', 0);
+        return e;
+    }
+
+    static public function createQuestionBlock() {
         var e = new Entity();
         e.add(new Transform());
         e.add(new Sprite("level-sheet", 13));
         return e;
+    }
+
+    static public function createBlocks(input:String) {
+        var result = new Array<Entity>();
+        var lines = input.split("\n");
+        var i = lines.length - 1;
+        while(i >= 0) {
+            var p = lines.length - i - 1;
+            var x = Config.firstCol * Config.blockSize;
+            var y = (Config.height - Config.firstRow) * Config.blockSize - p * Config.lineSpacing * Config.blockSize;
+            var advance = 0;
+            var isHidden = false;
+            for(c in 0...lines[i].length) {
+                var char = lines[i].charAt(c);
+                switch(char) {
+                    case '[':
+                        isHidden = true;
+                    case ']':
+                        isHidden = false;
+                    case ' ':
+                        advance++;
+                    default:
+                        var e:Entity;
+                        e = isHidden ? createQuestionBlock() : createLetterBlock(char);
+                        e.get(Transform).position.set(x + advance *Config.blockSize, y);
+                        result.push(e);
+                        advance++;
+                }
+            }
+            --i;
+        }
+        return result;
     }
 }

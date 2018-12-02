@@ -53,9 +53,11 @@ class Game {
         untyped playerSprite.body.setSize(16, 16);
         game.camera.follow(playerSprite);
 
-        var e = Factory.createBlock();
-        engine.addEntity(e);
-        e.get(Transform).position.set(20, 20);
+
+        var es = Factory.createBlocks("Name: [gogoprog]\nThats it\noh yeah");
+        for(e in es) {
+            engine.addEntity(e);
+        }
     }
 
     function update():Void {
