@@ -67,6 +67,7 @@ class Game {
         var game = whiplash.Lib.phaserGame;
         var mouseCoords = whiplash.Input.mouseCoordinates;
         var dt = whiplash.Lib.getDeltaTime() / 1000;
+        game.physics.arcade.collide(playerSprite, blockSprites);
         engine.update(dt);
 
         var mx = game.camera.x + mouseCoords.x * 0.5;
@@ -80,7 +81,6 @@ class Game {
         if(game.input.mousePointer.isDown) {
             untyped playerSprite.body.velocity.y = -125;
         }
-        game.physics.arcade.collide(playerSprite, blockSprites);
     }
 
     static function main():Void {

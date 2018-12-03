@@ -1389,6 +1389,7 @@ game_Game.prototype = {
 		var game1 = whiplash_Lib.phaserGame;
 		var mouseCoords = whiplash_Input.mouseCoordinates;
 		var dt = whiplash_Lib.getDeltaTime() / 1000;
+		game1.physics.arcade.collide(this.playerSprite,this.blockSprites);
 		this.engine.update(dt);
 		var mx = game1.camera.x + mouseCoords.x * 0.5;
 		if(this.playerSprite.position.x > mx) {
@@ -1399,7 +1400,6 @@ game_Game.prototype = {
 		if(game1.input.mousePointer.isDown) {
 			this.playerSprite.body.velocity.y = -125;
 		}
-		game1.physics.arcade.collide(this.playerSprite,this.blockSprites);
 	}
 	,__class__: game_Game
 };
