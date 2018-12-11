@@ -16,9 +16,6 @@ import whiplash.common.components.Active;
 
 class Game {
     var engine:ash.core.Engine;
-    var playerSprite:Sprite;
-    var blockSprites:Array<Sprite>;
-    var playerEntity:Entity;
 
     public function new() {
         new JQuery(window).on("load", function() {
@@ -35,7 +32,7 @@ class Game {
         var game = whiplash.Lib.phaserGame;
         game.stage.smoothed = false;
         Factory.init(game);
-        whiplash.Input.setup(document.querySelector("canvas"));
+        whiplash.Input.setup(document.querySelector("body"));
         game.world.setBounds(0, 0, 760, 14*15);
         game.physics.startSystem(phaser.Physics.ARCADE);
         game.time.desiredFps = 60;
@@ -47,40 +44,19 @@ class Game {
         engine.addEntity(e);
         var e = Factory.createPlayer();
         engine.addEntity(e);
-        playerEntity = e;
-        playerSprite = e.get(Sprite);
-
-        game.physics.enable(playerSprite, phaser.Physics.ARCADE);
-        untyped playerSprite.body.collideWorldBounds = true;
-        untyped playerSprite.body.setSize(14, 14);
-        game.camera.follow(playerSprite);
 
         var es = Factory.createBlocks("Name: [gogoprog]\nThats it\noh yeah");
-        blockSprites = [];
         for(e in es) {
             engine.addEntity(e);
-            blockSprites.push(e.get(Sprite));
         }
+
+        engine.addSystem(new ControlSystem(), 1);
     }
 
+
     function update():Void {
-        var game = whiplash.Lib.phaserGame;
-        var mouseCoords = whiplash.Input.mouseCoordinates;
         var dt = whiplash.Lib.getDeltaTime() / 1000;
-        game.physics.arcade.collide(playerSprite, blockSprites);
         engine.update(dt);
-
-        var mx = game.camera.x + mouseCoords.x * 0.5;
-
-        if(playerSprite.position.x > mx) {
-            untyped playerSprite.body.velocity.x = -100;
-        } else {
-            untyped playerSprite.body.velocity.x = 100;
-        }
-
-        if(game.input.mousePointer.isDown) {
-            untyped playerSprite.body.velocity.y = -125;
-        }
     }
 
     static function main():Void {

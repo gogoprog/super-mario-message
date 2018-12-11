@@ -35,14 +35,21 @@ class Factory {
 
     static public function createPlayer() {
         var e = new Entity();
+        e.name = "player";
         var sprite = new Sprite("mario-sprites");
         e.add(sprite);
+        sprite.anchor.set(0.5, 0.5);
         e.add(new Transform());
         e.get(Transform).position.y = 0;
         e.get(Transform).position.x = 16;
         sprite.animations.add("idle", ["mario/stand"]);
         sprite.animations.add("walk", [for(i in 1...4) "mario/walk" + i]);
         sprite.animations.play('walk', 15, true);
+        var sprite = e.get(Sprite);
+        whiplash.Lib.phaserGame.physics.enable(sprite, phaser.Physics.ARCADE);
+        untyped sprite.body.collideWorldBounds = true;
+        untyped sprite.body.setSize(11, 15);
+        whiplash.Lib.phaserGame.camera.follow(sprite);
         return e;
     }
 
@@ -50,6 +57,7 @@ class Factory {
         var e = new Entity();
         e.add(new Transform());
         e.add(new Sprite("level-sheet", 43));
+        e.add(new Block());
         e.add(new BitmapText("font", letter.toUpperCase(), 12));
         e.get(BitmapText).anchor.set(-0.2, -0.2);
         e.get(BitmapText).smoothed = false;
@@ -65,6 +73,7 @@ class Factory {
         var e = new Entity();
         e.add(new Transform());
         e.add(new Sprite("level-sheet", 13));
+        e.add(new Block());
         return e;
     }
 
