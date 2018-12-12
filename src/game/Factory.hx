@@ -11,7 +11,7 @@ class Factory {
         game.load.image("sky", "../data/textures/blue-sky.png");
         game.load.tilemap("level", cast "../data/tilemaps/level.json", cast null, cast phaser.Tilemap.TILED_JSON);
         game.load.atlas('mario-sprites', '../data/textures/mario-sprites.png', '../data/textures/mario-sprites.json');
-        game.load.spritesheet('level-sheet', '../data/textures/super-mario.png', 16, 16, 128, 1, 2);
+        game.load.spritesheet('level-sheet', '../data/textures/super-mario.png', Config.blockSize, Config.blockSize, 128, 1, 2);
         game.load.bitmapFont('font', '../data/fonts/font.png', '../data/fonts/font.fnt');
     }
 
@@ -41,7 +41,7 @@ class Factory {
         sprite.anchor.set(0.5, 0.5);
         e.add(new Transform());
         e.get(Transform).position.y = 0;
-        e.get(Transform).position.x = 16;
+        e.get(Transform).position.x = Config.blockSize;
         sprite.animations.add("idle", ["mario/stand"]);
         sprite.animations.add("jump", ["mario/jump"]);
         sprite.animations.add("walk", [for(i in 1...4) "mario/walk" + i]);
@@ -65,7 +65,7 @@ class Factory {
         e.get(BitmapText).smoothed = false;
         var sprite = e.get(Sprite);
         whiplash.Lib.phaserGame.physics.enable(sprite, phaser.Physics.ARCADE);
-        untyped sprite.body.setSize(16, 16);
+        untyped sprite.body.setSize(Config.blockSize, Config.blockSize);
         untyped sprite.body.immovable = true;
         untyped sprite.body.moves = false;
         return e;
@@ -75,7 +75,15 @@ class Factory {
         var e = new Entity();
         e.add(new Transform());
         e.add(new Sprite("level-sheet", 13));
-        e.add(new Block());
+        var sprite = e.get(Sprite);
+        sprite.animations.add("idle", [13.0, 40.0, 41.0, 42.0]);
+        sprite.animations.play('idle', 5, true);
+        e.add(new QuestionBlock());
+        var sprite = e.get(Sprite);
+        whiplash.Lib.phaserGame.physics.enable(sprite, phaser.Physics.ARCADE);
+        untyped sprite.body.setSize(Config.blockSize, Config.blockSize);
+        untyped sprite.body.immovable = true;
+        untyped sprite.body.moves = false;
         return e;
     }
 

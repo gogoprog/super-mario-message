@@ -113,7 +113,7 @@ class ControlSystem extends ash.core.System {
         }
     }
 
-    private function resetJump() {
+    public function resetJump() {
         jumpTime = 0;
         canJump = true;
         jumping = false;

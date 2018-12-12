@@ -51,6 +51,7 @@ class Game {
         }
 
         engine.addSystem(new ControlSystem(), 1);
+        engine.addSystem(new QuestionSystem(), 1);
     }
 
 

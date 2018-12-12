@@ -1410,7 +1410,7 @@ game_Factory.preload = function(game1) {
 	game1.load.image("sky","../data/textures/blue-sky.png");
 	game1.load.tilemap("level","../data/tilemaps/level.json",null,Phaser.Tilemap.TILED_JSON);
 	game1.load.atlas("mario-sprites","../data/textures/mario-sprites.png","../data/textures/mario-sprites.json");
-	game1.load.spritesheet("level-sheet","../data/textures/super-mario.png",16,16,128,1,2);
+	game1.load.spritesheet("level-sheet","../data/textures/super-mario.png",game_Config.blockSize,game_Config.blockSize,128,1,2);
 	game1.load.bitmapFont("font","../data/fonts/font.png","../data/fonts/font.fnt");
 };
 game_Factory.init = function(game1) {
@@ -1440,7 +1440,7 @@ game_Factory.createPlayer = function() {
 	sprite.anchor.set(0.5,0.5);
 	e.add(new whiplash_phaser_Transform());
 	e.get(whiplash_phaser_Transform).position.y = 0;
-	e.get(whiplash_phaser_Transform).position.x = 16;
+	e.get(whiplash_phaser_Transform).position.x = game_Config.blockSize;
 	sprite.animations.add("idle",["mario/stand"]);
 	sprite.animations.add("jump",["mario/jump"]);
 	var sprite1 = sprite.animations;
@@ -1470,7 +1470,7 @@ game_Factory.createLetterBlock = function(letter) {
 	e.get(whiplash_phaser_BitmapText).smoothed = false;
 	var sprite = e.get(whiplash_phaser_Sprite);
 	whiplash_Lib.phaserGame.physics.enable(sprite,Phaser.Physics.ARCADE);
-	sprite.body.setSize(16,16);
+	sprite.body.setSize(game_Config.blockSize,game_Config.blockSize);
 	sprite.body.immovable = true;
 	sprite.body.moves = false;
 	return e;
@@ -1479,7 +1479,15 @@ game_Factory.createQuestionBlock = function() {
 	var e = new ash_core_Entity();
 	e.add(new whiplash_phaser_Transform());
 	e.add(new whiplash_phaser_Sprite("level-sheet",13));
-	e.add(new game_Block());
+	var sprite = e.get(whiplash_phaser_Sprite);
+	sprite.animations.add("idle",[13.0,40.0,41.0,42.0]);
+	sprite.animations.play("idle",5,true);
+	e.add(new game_QuestionBlock());
+	var sprite1 = e.get(whiplash_phaser_Sprite);
+	whiplash_Lib.phaserGame.physics.enable(sprite1,Phaser.Physics.ARCADE);
+	sprite1.body.setSize(game_Config.blockSize,game_Config.blockSize);
+	sprite1.body.immovable = true;
+	sprite1.body.moves = false;
 	return e;
 };
 game_Factory.createBlocks = function(input) {
@@ -1556,6 +1564,7 @@ game_Game.prototype = {
 			this.engine.addEntity(e3);
 		}
 		this.engine.addSystem(new game_ControlSystem(),1);
+		this.engine.addSystem(new game_QuestionSystem(),1);
 	}
 	,update: function() {
 		var dt = whiplash_Lib.getDeltaTime() / 1000;
@@ -1566,6 +1575,114 @@ game_Game.prototype = {
 	}
 	,__class__: game_Game
 };
+var game_QuestionBlock = function() {
+};
+game_QuestionBlock.__name__ = ["game","QuestionBlock"];
+game_QuestionBlock.prototype = {
+	__class__: game_QuestionBlock
+};
+var game_QuestionNode = function() { };
+game_QuestionNode.__name__ = ["game","QuestionNode"];
+game_QuestionNode._getComponents = function() {
+	if(game_QuestionNode._components == null) {
+		game_QuestionNode._components = new ash_ClassMap();
+		var _this = game_QuestionNode._components;
+		var k = whiplash_phaser_Transform;
+		var name = Type.getClassName(k);
+		var _this1 = _this.keyMap;
+		if(__map_reserved[name] != null) {
+			_this1.setReserved(name,k);
+		} else {
+			_this1.h[name] = k;
+		}
+		var _this2 = _this.valueMap;
+		if(__map_reserved[name] != null) {
+			_this2.setReserved(name,"transform");
+		} else {
+			_this2.h[name] = "transform";
+		}
+		var _this3 = game_QuestionNode._components;
+		var k1 = whiplash_phaser_Sprite;
+		var name1 = Type.getClassName(k1);
+		var _this4 = _this3.keyMap;
+		if(__map_reserved[name1] != null) {
+			_this4.setReserved(name1,k1);
+		} else {
+			_this4.h[name1] = k1;
+		}
+		var _this5 = _this3.valueMap;
+		if(__map_reserved[name1] != null) {
+			_this5.setReserved(name1,"sprite");
+		} else {
+			_this5.h[name1] = "sprite";
+		}
+		var _this6 = game_QuestionNode._components;
+		var k2 = game_QuestionBlock;
+		var name2 = Type.getClassName(k2);
+		var _this7 = _this6.keyMap;
+		if(__map_reserved[name2] != null) {
+			_this7.setReserved(name2,k2);
+		} else {
+			_this7.h[name2] = k2;
+		}
+		var _this8 = _this6.valueMap;
+		if(__map_reserved[name2] != null) {
+			_this8.setReserved(name2,"qb");
+		} else {
+			_this8.h[name2] = "qb";
+		}
+	}
+	return game_QuestionNode._components;
+};
+game_QuestionNode.__super__ = ash_core_Node;
+game_QuestionNode.prototype = $extend(ash_core_Node.prototype,{
+	__class__: game_QuestionNode
+});
+var game_QuestionSystem = function() {
+	this.blockSprites = [];
+	ash_tools_ListIteratingSystem.call(this,game_QuestionNode,$bind(this,this.updateNode),$bind(this,this.onNodeAdded),$bind(this,this.onNodeRemoved));
+};
+game_QuestionSystem.__name__ = ["game","QuestionSystem"];
+game_QuestionSystem.__super__ = ash_tools_ListIteratingSystem;
+game_QuestionSystem.prototype = $extend(ash_tools_ListIteratingSystem.prototype,{
+	addToEngine: function(engine) {
+		ash_tools_ListIteratingSystem.prototype.addToEngine.call(this,engine);
+		this.engine = engine;
+		this.phaserGame = whiplash_Lib.phaserGame;
+		this.playerSprite = engine.entityNames.get("player").get(whiplash_phaser_Sprite);
+		var _g_current = this.nodeList.head;
+		while(_g_current != null) {
+			var node = _g_current;
+			_g_current = _g_current.next;
+			var node1 = node;
+			this.blockSprites.push(node1.sprite);
+		}
+	}
+	,removeFromEngine: function(engine) {
+		ash_tools_ListIteratingSystem.prototype.removeFromEngine.call(this,engine);
+	}
+	,update: function(dt) {
+		ash_tools_ListIteratingSystem.prototype.update.call(this,dt);
+		this.phaserGame.physics.arcade.collide(this.playerSprite,this.blockSprites,$bind(this,this.onCollide));
+	}
+	,updateNode: function(node,dt) {
+	}
+	,onNodeAdded: function(node) {
+	}
+	,onNodeRemoved: function(node) {
+	}
+	,onCollide: function(a,b) {
+		if(a == this.playerSprite) {
+			if(a.body.touching.down && b.body.touching.up) {
+				this.engine.getSystem(game_ControlSystem).resetJump();
+			}
+			if(a.body.touching.up && b.body.touching.down) {
+				b.tint = 16711680;
+			}
+		}
+	}
+	,__class__: game_QuestionSystem
+});
 var haxe_ds_IntMap = function() {
 	this.h = { };
 };
