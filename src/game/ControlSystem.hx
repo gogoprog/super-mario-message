@@ -47,22 +47,38 @@ class ControlSystem extends ash.core.System {
             var px = playerSprite.position.x;
             var dx = Math.abs(px - mx);
             var dir = px > mx ? -1 : 1;
-            if(dx > 16) {
-                untyped playerSprite.body.velocity.x = Math.min(dx, 100) * dir;
+            var playerBody = playerSprite.body;
+            var playerVelocity = untyped playerBody.velocity;
+            var vx = playerVelocity.x;
+            var vy = playerVelocity.y;
+            if(dx > Config.moveMinDistance) {
+                var distance = Math.min(dx, Config.moveMaxDistance);
+                var factor = distance / Config.moveMaxDistance;
+                untyped playerVelocity.x = Config.moveSpeed * factor * dir;
+                if(!jumping) {
+                    if(vy  == 0) {
+                        playerSprite.animations.play('walk', 15, true);
+                    }
+                    playerSprite.animations.currentAnim.speed = 16 * factor;
+                }
             } else {
-                untyped playerSprite.body.velocity.x = 0;
+                untyped playerBody.velocity.x = 0;
+                if(vy == 0) {
+                    playerSprite.animations.play('idle', 15, true);
+                }
             }
             playerEntity.get(Transform).scale.x = dir;
-            if(canJump) {
+            if(canJump && vy == 0) {
                 if(whiplash.Input.mouseButtons[0]) {
-                    untyped playerSprite.body.velocity.y = -200;
+                    untyped playerBody.velocity.y = Config.jumpVelocity;
                     canJump = false;
                     jumping = true;
+                    playerSprite.animations.play('jump', 15, true);
                 }
             }
             if(jumping) {
-                if(jumpTime < 0.3 && whiplash.Input.mouseButtons[0]) {
-                    untyped playerSprite.body.velocity.y = -200;
+                if(jumpTime < Config.jumpMaxTime && whiplash.Input.mouseButtons[0]) {
+                    untyped playerBody.velocity.y = Config.jumpVelocity;
                 } else {
                     jumping = false;
                 }

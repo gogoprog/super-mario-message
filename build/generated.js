@@ -1328,22 +1328,38 @@ game_ControlSystem.prototype = $extend(ash_core_System.prototype,{
 			var px = this.playerSprite.position.x;
 			var dx = Math.abs(px - mx);
 			var dir = px > mx ? -1 : 1;
-			if(dx > 16) {
-				this.playerSprite.body.velocity.x = Math.min(dx,100) * dir;
+			var playerBody = this.playerSprite.body;
+			var playerVelocity = playerBody.velocity;
+			var vx = playerVelocity.x;
+			var vy = playerVelocity.y;
+			if(dx > game_Config.moveMinDistance) {
+				var distance = Math.min(dx,game_Config.moveMaxDistance);
+				var factor = distance / game_Config.moveMaxDistance;
+				playerVelocity.x = game_Config.moveSpeed * factor * dir;
+				if(!this.jumping) {
+					if(vy == 0) {
+						this.playerSprite.animations.play("walk",15,true);
+					}
+					this.playerSprite.animations.currentAnim.speed = 16 * factor;
+				}
 			} else {
-				this.playerSprite.body.velocity.x = 0;
+				playerBody.velocity.x = 0;
+				if(vy == 0) {
+					this.playerSprite.animations.play("idle",15,true);
+				}
 			}
 			this.playerEntity.get(whiplash_phaser_Transform).scale.x = dir;
-			if(this.canJump) {
+			if(this.canJump && vy == 0) {
 				if(whiplash_Input.mouseButtons.h[0]) {
-					this.playerSprite.body.velocity.y = -200;
+					playerBody.velocity.y = game_Config.jumpVelocity;
 					this.canJump = false;
 					this.jumping = true;
+					this.playerSprite.animations.play("jump",15,true);
 				}
 			}
 			if(this.jumping) {
-				if(this.jumpTime < 0.3 && whiplash_Input.mouseButtons.h[0]) {
-					this.playerSprite.body.velocity.y = -200;
+				if(this.jumpTime < game_Config.jumpMaxTime && whiplash_Input.mouseButtons.h[0]) {
+					playerBody.velocity.y = game_Config.jumpVelocity;
 				} else {
 					this.jumping = false;
 				}
@@ -1426,6 +1442,7 @@ game_Factory.createPlayer = function() {
 	e.get(whiplash_phaser_Transform).position.y = 0;
 	e.get(whiplash_phaser_Transform).position.x = 16;
 	sprite.animations.add("idle",["mario/stand"]);
+	sprite.animations.add("jump",["mario/jump"]);
 	var sprite1 = sprite.animations;
 	var _g = [];
 	var _g1 = 1;
@@ -2881,6 +2898,11 @@ game_Config.firstRow = 6;
 game_Config.lineSpacing = 3;
 game_Config.blockSize = 16;
 game_Config.height = 15;
+game_Config.moveMinDistance = 8;
+game_Config.moveMaxDistance = 50;
+game_Config.moveSpeed = 110;
+game_Config.jumpVelocity = -200;
+game_Config.jumpMaxTime = 0.28;
 haxe_ds_ObjectMap.count = 0;
 js_Boot.__toStr = ({ }).toString;
 whiplash_Input.keys = new haxe_ds_StringMap();

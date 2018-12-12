@@ -43,6 +43,7 @@ class Factory {
         e.get(Transform).position.y = 0;
         e.get(Transform).position.x = 16;
         sprite.animations.add("idle", ["mario/stand"]);
+        sprite.animations.add("jump", ["mario/jump"]);
         sprite.animations.add("walk", [for(i in 1...4) "mario/walk" + i]);
         sprite.animations.play('walk', 15, true);
         var sprite = e.get(Sprite);
