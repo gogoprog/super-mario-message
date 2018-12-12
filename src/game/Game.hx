@@ -19,7 +19,7 @@ class Game {
 
     public function new() {
         new JQuery(window).on("load", function() {
-            whiplash.Lib.init(320, 240, ".root", {preload:preload, create:create, update:update});
+            whiplash.Lib.init(320, 240, ".root", {preload:preload, create:create, update:update, render:render});
             engine = whiplash.Lib.ashEngine;
         });
     }
@@ -57,6 +57,10 @@ class Game {
     function update():Void {
         var dt = whiplash.Lib.getDeltaTime() / 1000;
         engine.update(dt);
+    }
+
+    function render():Void {
+        engine.getSystem(ControlSystem).render();
     }
 
     static function main():Void {

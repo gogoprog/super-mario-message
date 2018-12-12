@@ -48,7 +48,8 @@ class Factory {
         var sprite = e.get(Sprite);
         whiplash.Lib.phaserGame.physics.enable(sprite, phaser.Physics.ARCADE);
         untyped sprite.body.collideWorldBounds = true;
-        untyped sprite.body.setSize(11, 15);
+        untyped sprite.body.setSize(8, 15);
+        untyped sprite.body.offset.setTo(4, 0);
         whiplash.Lib.phaserGame.camera.follow(sprite);
         return e;
     }

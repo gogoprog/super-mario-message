@@ -52,7 +52,14 @@ class ControlSystem extends ash.core.System {
                 untyped playerSprite.body.velocity.y = -125;
             }
         }
-        if(whiplash.Input.keys[" "]) {
+    }
+
+    public function render() {
+        if(whiplash.Input.keys["F2"]) {
+            phaserGame.debug.body(playerSprite);
+            for(b in blockSprites) {
+                phaserGame.debug.body(b);
+            }
         }
     }
 }

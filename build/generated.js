@@ -1333,8 +1333,19 @@ game_ControlSystem.prototype = $extend(ash_core_System.prototype,{
 				this.playerSprite.body.velocity.y = -125;
 			}
 		}
+	}
+	,render: function() {
 		var _this = whiplash_Input.keys;
-		var tmp = __map_reserved[" "] != null ? _this.getReserved(" ") : _this.h[" "];
+		if(__map_reserved["F2"] != null ? _this.getReserved("F2") : _this.h["F2"]) {
+			this.phaserGame.debug.body(this.playerSprite);
+			var _g = 0;
+			var _g1 = this.blockSprites;
+			while(_g < _g1.length) {
+				var b = _g1[_g];
+				++_g;
+				this.phaserGame.debug.body(b);
+			}
+		}
 	}
 	,__class__: game_ControlSystem
 });
@@ -1389,7 +1400,8 @@ game_Factory.createPlayer = function() {
 	var sprite2 = e.get(whiplash_phaser_Sprite);
 	whiplash_Lib.phaserGame.physics.enable(sprite2,Phaser.Physics.ARCADE);
 	sprite2.body.collideWorldBounds = true;
-	sprite2.body.setSize(11,15);
+	sprite2.body.setSize(8,15);
+	sprite2.body.offset.setTo(4,0);
 	whiplash_Lib.phaserGame.camera.follow(sprite2);
 	return e;
 };
@@ -1454,7 +1466,7 @@ game_Factory.createBlocks = function(input) {
 var game_Game = function() {
 	var _gthis = this;
 	$(window).on("load",null,function() {
-		whiplash_Lib.init(320,240,".root",{ preload : $bind(_gthis,_gthis.preload), create : $bind(_gthis,_gthis.create), update : $bind(_gthis,_gthis.update)});
+		whiplash_Lib.init(320,240,".root",{ preload : $bind(_gthis,_gthis.preload), create : $bind(_gthis,_gthis.create), update : $bind(_gthis,_gthis.update), render : $bind(_gthis,_gthis.render)});
 		_gthis.engine = whiplash_Lib.ashEngine;
 	});
 };
@@ -1493,6 +1505,9 @@ game_Game.prototype = {
 	,update: function() {
 		var dt = whiplash_Lib.getDeltaTime() / 1000;
 		this.engine.update(dt);
+	}
+	,render: function() {
+		this.engine.getSystem(game_ControlSystem).render();
 	}
 	,__class__: game_Game
 };
@@ -2078,7 +2093,7 @@ whiplash_Lib.init = function(width,height,parent,callbacks,options,systemsPriori
 	}
 	var parentElement = window.document.querySelector(parent);
 	whiplash_Lib.ashEngine = new ash_core_Engine();
-	whiplash_Lib.phaserGame = new Phaser.Game(width,height,Phaser.CANVAS,parentElement,{ preload : callbacks.preload, create : callbacks.create, update : callbacks.update});
+	whiplash_Lib.phaserGame = new Phaser.Game(width,height,Phaser.CANVAS,parentElement,{ preload : callbacks.preload, create : callbacks.create, update : callbacks.update, render : callbacks.render});
 	whiplash_Lib.phaserGame.transparent = true;
 	whiplash_Lib.getDeltaTime = function() {
 		return whiplash_Lib.phaserGame.time.elapsed;
