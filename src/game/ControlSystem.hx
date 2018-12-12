@@ -14,6 +14,9 @@ class ControlSystem extends ash.core.System {
     private var phaserGame:phaser.Game;
     private var blockSprites:Array<Sprite> = [];
     private var mouseEnabled:Bool = true;
+    private var canJump:Bool = false;
+    private var jumping:Bool = false;
+    private var jumpTime:Float = 0;
 
     public function new() {
         super();
@@ -28,6 +31,8 @@ class ControlSystem extends ash.core.System {
         for(node in list) {
             blockSprites.push(node.sprite);
         }
+        untyped playerSprite.body.onWorldBounds = untyped __js__("new Phaser.Signal()");
+        untyped playerSprite.body.onWorldBounds.add(hitWorldBounds, this);
     }
 
     public override function removeFromEngine(engine:Engine) {
@@ -35,7 +40,7 @@ class ControlSystem extends ash.core.System {
     }
 
     public override function update(dt:Float) {
-        phaserGame.physics.arcade.collide(playerSprite, blockSprites);
+        phaserGame.physics.arcade.collide(playerSprite, blockSprites, onCollide);
         if(mouseEnabled) {
             var mouseCoords = whiplash.Input.mouseCoordinates;
             var mx = phaserGame.camera.x + mouseCoords.x * 0.5;
@@ -48,9 +53,24 @@ class ControlSystem extends ash.core.System {
                 untyped playerSprite.body.velocity.x = 0;
             }
             playerEntity.get(Transform).scale.x = dir;
-            if(phaserGame.input.mousePointer.isDown) {
-                untyped playerSprite.body.velocity.y = -125;
+            if(canJump) {
+                if(whiplash.Input.mouseButtons[0]) {
+                    untyped playerSprite.body.velocity.y = -200;
+                    canJump = false;
+                    jumping = true;
+                }
             }
+            if(jumping) {
+                if(jumpTime < 0.3 && whiplash.Input.mouseButtons[0]) {
+                    untyped playerSprite.body.velocity.y = -200;
+                } else {
+                    jumping = false;
+                }
+                jumpTime += dt;
+            }
+        }
+        if(whiplash.Input.keys[" "]) {
+            untyped playerSprite.body.velocity.y = -200;
         }
     }
 
@@ -61,6 +81,26 @@ class ControlSystem extends ash.core.System {
                 phaserGame.debug.body(b);
             }
         }
+    }
+
+    private function onCollide(a, b) {
+        if(a == playerSprite) {
+            if(untyped a.body.touching.down && untyped b.body.touching.up) {
+                resetJump();
+            }
+        }
+    }
+
+    private function hitWorldBounds(player) {
+        if(player.body.position.y >= 195) {
+            resetJump();
+        }
+    }
+
+    private function resetJump() {
+        jumpTime = 0;
+        canJump = true;
+        jumping = false;
     }
 }
 

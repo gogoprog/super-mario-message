@@ -1291,6 +1291,9 @@ game_BlockNode.prototype = $extend(ash_core_Node.prototype,{
 	__class__: game_BlockNode
 });
 var game_ControlSystem = function() {
+	this.jumpTime = 0;
+	this.jumping = false;
+	this.canJump = false;
 	this.mouseEnabled = true;
 	this.blockSprites = [];
 	ash_core_System.call(this);
@@ -1311,12 +1314,14 @@ game_ControlSystem.prototype = $extend(ash_core_System.prototype,{
 			var node1 = node;
 			this.blockSprites.push(node1.sprite);
 		}
+		this.playerSprite.body.onWorldBounds = new Phaser.Signal();
+		this.playerSprite.body.onWorldBounds.add($bind(this,this.hitWorldBounds),this);
 	}
 	,removeFromEngine: function(engine) {
 		ash_core_System.prototype.removeFromEngine.call(this,engine);
 	}
 	,update: function(dt) {
-		this.phaserGame.physics.arcade.collide(this.playerSprite,this.blockSprites);
+		this.phaserGame.physics.arcade.collide(this.playerSprite,this.blockSprites,$bind(this,this.onCollide));
 		if(this.mouseEnabled) {
 			var mouseCoords = whiplash_Input.mouseCoordinates;
 			var mx = this.phaserGame.camera.x + mouseCoords.x * 0.5;
@@ -1329,9 +1334,25 @@ game_ControlSystem.prototype = $extend(ash_core_System.prototype,{
 				this.playerSprite.body.velocity.x = 0;
 			}
 			this.playerEntity.get(whiplash_phaser_Transform).scale.x = dir;
-			if(this.phaserGame.input.mousePointer.isDown) {
-				this.playerSprite.body.velocity.y = -125;
+			if(this.canJump) {
+				if(whiplash_Input.mouseButtons.h[0]) {
+					this.playerSprite.body.velocity.y = -200;
+					this.canJump = false;
+					this.jumping = true;
+				}
 			}
+			if(this.jumping) {
+				if(this.jumpTime < 0.3 && whiplash_Input.mouseButtons.h[0]) {
+					this.playerSprite.body.velocity.y = -200;
+				} else {
+					this.jumping = false;
+				}
+				this.jumpTime += dt;
+			}
+		}
+		var _this = whiplash_Input.keys;
+		if(__map_reserved[" "] != null ? _this.getReserved(" ") : _this.h[" "]) {
+			this.playerSprite.body.velocity.y = -200;
 		}
 	}
 	,render: function() {
@@ -1346,6 +1367,23 @@ game_ControlSystem.prototype = $extend(ash_core_System.prototype,{
 				this.phaserGame.debug.body(b);
 			}
 		}
+	}
+	,onCollide: function(a,b) {
+		if(a == this.playerSprite) {
+			if(a.body.touching.down && b.body.touching.up) {
+				this.resetJump();
+			}
+		}
+	}
+	,hitWorldBounds: function(player) {
+		if(player.body.position.y >= 195) {
+			this.resetJump();
+		}
+	}
+	,resetJump: function() {
+		this.jumpTime = 0;
+		this.canJump = true;
+		this.jumping = false;
 	}
 	,__class__: game_ControlSystem
 });
@@ -1482,11 +1520,11 @@ game_Game.prototype = {
 		var game1 = whiplash_Lib.phaserGame;
 		game1.stage.smoothed = false;
 		game_Factory.init(game1);
-		whiplash_Input.setup(window.document.querySelector("body"));
+		whiplash_Input.setup(window.document.querySelector(".hud"));
 		game1.world.setBounds(0,0,760,210);
 		game1.physics.startSystem(Phaser.Physics.ARCADE);
 		game1.time.desiredFps = 60;
-		game1.physics.arcade.gravity.y = 250;
+		game1.physics.arcade.gravity.y = 800;
 		var e = game_Factory.createSky();
 		this.engine.addEntity(e);
 		var e1 = game_Factory.createLevel();

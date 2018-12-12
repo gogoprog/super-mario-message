@@ -32,11 +32,11 @@ class Game {
         var game = whiplash.Lib.phaserGame;
         game.stage.smoothed = false;
         Factory.init(game);
-        whiplash.Input.setup(document.querySelector("body"));
+        whiplash.Input.setup(document.querySelector(".hud"));
         game.world.setBounds(0, 0, 760, 14*15);
         game.physics.startSystem(phaser.Physics.ARCADE);
         game.time.desiredFps = 60;
-        game.physics.arcade.gravity.y = 250;
+        game.physics.arcade.gravity.y = 800;
 
         var e = Factory.createSky();
         engine.addEntity(e);
