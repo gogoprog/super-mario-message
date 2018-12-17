@@ -1460,14 +1460,18 @@ game_Factory.createPlayer = function() {
 	whiplash_Lib.phaserGame.camera.follow(sprite2);
 	return e;
 };
+game_Factory.createBitmapText = function(text) {
+	var bt = new whiplash_phaser_BitmapText("font",text.toUpperCase(),12);
+	bt.anchor.set(-0.2,-0.2);
+	bt.smoothed = false;
+	return bt;
+};
 game_Factory.createLetterBlock = function(letter) {
 	var e = new ash_core_Entity();
 	e.add(new whiplash_phaser_Transform());
 	e.add(new whiplash_phaser_Sprite("level-sheet",43));
 	e.add(new game_Block());
-	e.add(new whiplash_phaser_BitmapText("font",letter.toUpperCase(),12));
-	e.get(whiplash_phaser_BitmapText).anchor.set(-0.2,-0.2);
-	e.get(whiplash_phaser_BitmapText).smoothed = false;
+	e.add(game_Factory.createBitmapText(letter));
 	var sprite = e.get(whiplash_phaser_Sprite);
 	whiplash_Lib.phaserGame.physics.enable(sprite,Phaser.Physics.ARCADE);
 	sprite.body.setSize(game_Config.blockSize,game_Config.blockSize);
@@ -1475,14 +1479,15 @@ game_Factory.createLetterBlock = function(letter) {
 	sprite.body.moves = false;
 	return e;
 };
-game_Factory.createQuestionBlock = function() {
+game_Factory.createQuestionBlock = function(letter) {
 	var e = new ash_core_Entity();
 	e.add(new whiplash_phaser_Transform());
 	e.add(new whiplash_phaser_Sprite("level-sheet",13));
 	var sprite = e.get(whiplash_phaser_Sprite);
 	sprite.animations.add("idle",[13.0,40.0,41.0,42.0]);
+	sprite.animations.add("block",[43.0]);
 	sprite.animations.play("idle",5,true);
-	e.add(new game_QuestionBlock());
+	e.add(new game_QuestionBlock(game_Factory.createBitmapText(letter)));
 	var sprite1 = e.get(whiplash_phaser_Sprite);
 	whiplash_Lib.phaserGame.physics.enable(sprite1,Phaser.Physics.ARCADE);
 	sprite1.body.setSize(game_Config.blockSize,game_Config.blockSize);
@@ -1516,7 +1521,7 @@ game_Factory.createBlocks = function(input) {
 				isHidden = false;
 				break;
 			default:
-				var e = isHidden ? game_Factory.createQuestionBlock() : game_Factory.createLetterBlock($char);
+				var e = isHidden ? game_Factory.createQuestionBlock($char) : game_Factory.createLetterBlock($char);
 				e.get(whiplash_phaser_Transform).position.set(x + advance * game_Config.blockSize,y);
 				result.push(e);
 				++advance;
@@ -1563,8 +1568,9 @@ game_Game.prototype = {
 			++_g;
 			this.engine.addEntity(e3);
 		}
-		this.engine.addSystem(new game_ControlSystem(),1);
 		this.engine.addSystem(new game_QuestionSystem(),1);
+		this.engine.addSystem(new game_ShakeSystem(),1);
+		this.engine.addSystem(new game_ControlSystem(),2);
 	}
 	,update: function() {
 		var dt = whiplash_Lib.getDeltaTime() / 1000;
@@ -1575,7 +1581,8 @@ game_Game.prototype = {
 	}
 	,__class__: game_Game
 };
-var game_QuestionBlock = function() {
+var game_QuestionBlock = function(bt) {
+	this.bt = bt;
 };
 game_QuestionBlock.__name__ = ["game","QuestionBlock"];
 game_QuestionBlock.prototype = {
@@ -1656,6 +1663,7 @@ game_QuestionSystem.prototype = $extend(ash_tools_ListIteratingSystem.prototype,
 			_g_current = _g_current.next;
 			var node1 = node;
 			this.blockSprites.push(node1.sprite);
+			node1.sprite.entity = node1.entity;
 		}
 	}
 	,removeFromEngine: function(engine) {
@@ -1677,11 +1685,99 @@ game_QuestionSystem.prototype = $extend(ash_tools_ListIteratingSystem.prototype,
 				this.engine.getSystem(game_ControlSystem).resetJump();
 			}
 			if(a.body.touching.up && b.body.touching.down) {
-				b.tint = 16711680;
+				var e = b.entity;
+				if(e.get(game_Shake) == null) {
+					e.add(new game_Shake());
+				}
+				b.animations.play("block");
+				e.add(e.get(game_QuestionBlock).bt);
 			}
 		}
 	}
 	,__class__: game_QuestionSystem
+});
+var game_Shake = function() {
+	this.up = true;
+	this.time = 0;
+};
+game_Shake.__name__ = ["game","Shake"];
+game_Shake.prototype = {
+	__class__: game_Shake
+};
+var game_ShakeNode = function() { };
+game_ShakeNode.__name__ = ["game","ShakeNode"];
+game_ShakeNode._getComponents = function() {
+	if(game_ShakeNode._components == null) {
+		game_ShakeNode._components = new ash_ClassMap();
+		var _this = game_ShakeNode._components;
+		var k = whiplash_phaser_Transform;
+		var name = Type.getClassName(k);
+		var _this1 = _this.keyMap;
+		if(__map_reserved[name] != null) {
+			_this1.setReserved(name,k);
+		} else {
+			_this1.h[name] = k;
+		}
+		var _this2 = _this.valueMap;
+		if(__map_reserved[name] != null) {
+			_this2.setReserved(name,"transform");
+		} else {
+			_this2.h[name] = "transform";
+		}
+		var _this3 = game_ShakeNode._components;
+		var k1 = game_Shake;
+		var name1 = Type.getClassName(k1);
+		var _this4 = _this3.keyMap;
+		if(__map_reserved[name1] != null) {
+			_this4.setReserved(name1,k1);
+		} else {
+			_this4.h[name1] = k1;
+		}
+		var _this5 = _this3.valueMap;
+		if(__map_reserved[name1] != null) {
+			_this5.setReserved(name1,"shake");
+		} else {
+			_this5.h[name1] = "shake";
+		}
+	}
+	return game_ShakeNode._components;
+};
+game_ShakeNode.__super__ = ash_core_Node;
+game_ShakeNode.prototype = $extend(ash_core_Node.prototype,{
+	__class__: game_ShakeNode
+});
+var game_ShakeSystem = function() {
+	ash_tools_ListIteratingSystem.call(this,game_ShakeNode,$bind(this,this.updateNode),$bind(this,this.onNodeAdded),$bind(this,this.onNodeRemoved));
+};
+game_ShakeSystem.__name__ = ["game","ShakeSystem"];
+game_ShakeSystem.__super__ = ash_tools_ListIteratingSystem;
+game_ShakeSystem.prototype = $extend(ash_tools_ListIteratingSystem.prototype,{
+	addToEngine: function(engine) {
+		ash_tools_ListIteratingSystem.prototype.addToEngine.call(this,engine);
+		this.engine = engine;
+	}
+	,removeFromEngine: function(engine) {
+		ash_tools_ListIteratingSystem.prototype.removeFromEngine.call(this,engine);
+	}
+	,updateNode: function(node,dt) {
+		var shake = node.shake;
+		var p = node.transform.position;
+		var speed = 20;
+		shake.time += dt;
+		p.y = shake.y - (Math.sin(shake.time * speed - Math.PI / 2) + 1) * 4;
+		if(shake.time * speed > Math.PI * 2) {
+			p.y = shake.y;
+			node.entity.remove(game_Shake);
+		}
+	}
+	,onNodeAdded: function(node) {
+		var shake = node.shake;
+		var p = node.transform.position;
+		shake.y = p.y;
+	}
+	,onNodeRemoved: function(node) {
+	}
+	,__class__: game_ShakeSystem
 });
 var haxe_ds_IntMap = function() {
 	this.h = { };

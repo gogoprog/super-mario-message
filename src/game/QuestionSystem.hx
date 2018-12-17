@@ -27,6 +27,7 @@ class QuestionSystem extends ListIteratingSystem<QuestionNode> {
         playerSprite = engine.getEntityByName("player").get(Sprite);
         for(node in nodeList) {
             blockSprites.push(node.sprite);
+            untyped node.sprite.entity = node.entity;
         }
     }
 
@@ -54,7 +55,13 @@ class QuestionSystem extends ListIteratingSystem<QuestionNode> {
                 engine.getSystem(ControlSystem).resetJump();
             }
             if(untyped a.body.touching.up && untyped b.body.touching.down) {
-                b.tint = 0xFF0000;
+                var e:Entity = untyped b.entity;
+                if(e.get(Shake) == null) {
+                    e.add(new Shake());
+                }
+                b.animations.play("block");
+
+                e.add(e.get(QuestionBlock).bt);
             }
         }
     }

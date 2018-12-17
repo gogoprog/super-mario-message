@@ -50,8 +50,9 @@ class Game {
             engine.addEntity(e);
         }
 
-        engine.addSystem(new ControlSystem(), 1);
         engine.addSystem(new QuestionSystem(), 1);
+        engine.addSystem(new ShakeSystem(), 1);
+        engine.addSystem(new ControlSystem(), 2);
     }
 
 

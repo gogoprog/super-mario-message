@@ -55,14 +55,18 @@ class Factory {
         return e;
     }
 
+    static public function createBitmapText(text) {
+        var bt = new BitmapText("font", text.toUpperCase(), 12);
+        bt.anchor.set(-0.2, -0.2);
+        bt.smoothed = false;
+        return bt;
+    }
     static public function createLetterBlock(letter) {
         var e = new Entity();
         e.add(new Transform());
         e.add(new Sprite("level-sheet", 43));
         e.add(new Block());
-        e.add(new BitmapText("font", letter.toUpperCase(), 12));
-        e.get(BitmapText).anchor.set(-0.2, -0.2);
-        e.get(BitmapText).smoothed = false;
+        e.add(createBitmapText(letter));
         var sprite = e.get(Sprite);
         whiplash.Lib.phaserGame.physics.enable(sprite, phaser.Physics.ARCADE);
         untyped sprite.body.setSize(Config.blockSize, Config.blockSize);
@@ -71,14 +75,15 @@ class Factory {
         return e;
     }
 
-    static public function createQuestionBlock() {
+    static public function createQuestionBlock(letter) {
         var e = new Entity();
         e.add(new Transform());
         e.add(new Sprite("level-sheet", 13));
         var sprite = e.get(Sprite);
         sprite.animations.add("idle", [13.0, 40.0, 41.0, 42.0]);
+        sprite.animations.add("block", [43.0]);
         sprite.animations.play('idle', 5, true);
-        e.add(new QuestionBlock());
+        e.add(new QuestionBlock(createBitmapText(letter)));
         var sprite = e.get(Sprite);
         whiplash.Lib.phaserGame.physics.enable(sprite, phaser.Physics.ARCADE);
         untyped sprite.body.setSize(Config.blockSize, Config.blockSize);
@@ -108,7 +113,7 @@ class Factory {
                         advance++;
                     default:
                         var e:Entity;
-                        e = isHidden ? createQuestionBlock() : createLetterBlock(char);
+                        e = isHidden ? createQuestionBlock(char) : createLetterBlock(char);
                         e.get(Transform).position.set(x + advance * Config.blockSize, y);
                         result.push(e);
                         advance++;
