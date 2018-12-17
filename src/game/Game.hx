@@ -45,7 +45,7 @@ class Game {
         var e = Factory.createPlayer();
         engine.addEntity(e);
 
-        var es = Factory.createBlocks("Name: [gogoprog]\nThats it\noh yeah");
+        var es = Factory.createBlocks(untyped $global.window.message);
         for(e in es) {
             engine.addEntity(e);
         }

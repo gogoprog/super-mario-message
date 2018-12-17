@@ -1561,7 +1561,7 @@ game_Game.prototype = {
 		this.engine.addEntity(e1);
 		var e2 = game_Factory.createPlayer();
 		this.engine.addEntity(e2);
-		var es = game_Factory.createBlocks("Name: [gogoprog]\nThats it\noh yeah");
+		var es = game_Factory.createBlocks($global.window.message);
 		var _g = 0;
 		while(_g < es.length) {
 			var e3 = es[_g];
