@@ -1240,6 +1240,44 @@ ash_tools_ListIteratingSystem.prototype = $extend(ash_core_System.prototype,{
 	}
 	,__class__: ash_tools_ListIteratingSystem
 });
+var game_AudioManager = function() { };
+game_AudioManager.__name__ = ["game","AudioManager"];
+game_AudioManager.preload = function(game1) {
+	game1.load.audio("music","../data/audio/overworld.ogg");
+};
+game_AudioManager.init = function(game1) {
+	var this1 = game_AudioManager.sounds;
+	var v = game1.add.audio("music");
+	var _this = this1;
+	var value = v;
+	if(__map_reserved["music"] != null) {
+		_this.setReserved("music",value);
+	} else {
+		_this.h["music"] = value;
+	}
+};
+game_AudioManager.playSound = function(name) {
+	var _this = game_AudioManager.sounds;
+	if(!(__map_reserved[name] != null ? _this.existsReserved(name) : _this.h.hasOwnProperty(name))) {
+		console.log("Unknown sound: " + name);
+		return;
+	}
+	var _this1 = game_AudioManager.sounds;
+	(__map_reserved[name] != null ? _this1.getReserved(name) : _this1.h[name]).play();
+};
+game_AudioManager.playMusic = function(name) {
+	var _this = game_AudioManager.sounds;
+	if((__map_reserved[name] != null ? _this.getReserved(name) : _this.h[name]) == game_AudioManager.music) {
+		return;
+	}
+	if(game_AudioManager.music != null) {
+		game_AudioManager.music.stop();
+	}
+	var _this1 = game_AudioManager.sounds;
+	(__map_reserved[name] != null ? _this1.getReserved(name) : _this1.h[name]).play("",0,1,true);
+	var _this2 = game_AudioManager.sounds;
+	game_AudioManager.music = __map_reserved[name] != null ? _this2.getReserved(name) : _this2.h[name];
+};
 var game_Block = function() {
 };
 game_Block.__name__ = ["game","Block"];
@@ -1544,11 +1582,13 @@ game_Game.main = function() {
 };
 game_Game.prototype = {
 	preload: function() {
+		game_AudioManager.preload(whiplash_Lib.phaserGame);
 		game_Factory.preload(whiplash_Lib.phaserGame);
 	}
 	,create: function() {
 		var game1 = whiplash_Lib.phaserGame;
 		game1.stage.smoothed = false;
+		game_AudioManager.init(game1);
 		game_Factory.init(game1);
 		whiplash_Input.setup(window.document.querySelector(".hud"));
 		game1.world.setBounds(0,0,760,210);
@@ -1561,7 +1601,7 @@ game_Game.prototype = {
 		this.engine.addEntity(e1);
 		var e2 = game_Factory.createPlayer();
 		this.engine.addEntity(e2);
-		var es = game_Factory.createBlocks($global.window.message);
+		var es = game_Factory.createBlocks($global.window.message || "debugging\nsession");
 		var _g = 0;
 		while(_g < es.length) {
 			var e3 = es[_g];
@@ -1571,6 +1611,7 @@ game_Game.prototype = {
 		this.engine.addSystem(new game_QuestionSystem(),1);
 		this.engine.addSystem(new game_ShakeSystem(),1);
 		this.engine.addSystem(new game_ControlSystem(),2);
+		game_AudioManager.playMusic("music");
 	}
 	,update: function() {
 		var dt = whiplash_Lib.getDeltaTime() / 1000;
@@ -3106,6 +3147,7 @@ var Class = { __name__ : ["Class"]};
 var Enum = { };
 var __map_reserved = {};
 ash_core_Entity.nameCount = 0;
+game_AudioManager.sounds = new haxe_ds_StringMap();
 game_Config.firstCol = 4;
 game_Config.firstRow = 6;
 game_Config.lineSpacing = 3;

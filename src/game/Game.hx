@@ -25,12 +25,14 @@ class Game {
     }
 
     function preload():Void {
+        AudioManager.preload(whiplash.Lib.phaserGame);
         Factory.preload(whiplash.Lib.phaserGame);
     }
 
     function create():Void {
         var game = whiplash.Lib.phaserGame;
         game.stage.smoothed = false;
+        AudioManager.init(game);
         Factory.init(game);
         whiplash.Input.setup(document.querySelector(".hud"));
         game.world.setBounds(0, 0, 760, 14*15);
@@ -45,7 +47,7 @@ class Game {
         var e = Factory.createPlayer();
         engine.addEntity(e);
 
-        var es = Factory.createBlocks(untyped $global.window.message);
+        var es = Factory.createBlocks(untyped $global.window.message || "debugging\nsession");
         for(e in es) {
             engine.addEntity(e);
         }
@@ -53,6 +55,8 @@ class Game {
         engine.addSystem(new QuestionSystem(), 1);
         engine.addSystem(new ShakeSystem(), 1);
         engine.addSystem(new ControlSystem(), 2);
+
+        AudioManager.playMusic("music");
     }
 
 
