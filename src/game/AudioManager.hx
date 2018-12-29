@@ -1,15 +1,25 @@
 package game ;
 
 class AudioManager {
-    static public var sounds:Map<String, Dynamic> = new Map();
+    static public var sounds:Map<String, Dynamic> = [
+                "overworld" => null,
+                "jump" => null,
+                "coin" => null,
+                "1up" => null,
+                "bump" => null,
+            ];
     static public var music:Dynamic;
 
     static public function preload(game:phaser.Game) {
-        game.load.audio("music", "../data/audio/overworld.ogg");
+        for(name in sounds.keys()) {
+            game.load.audio(name, "../data/audio/" + name + ".ogg");
+        }
     }
 
     static public function init(game:phaser.Game) {
-        sounds["music"] = game.add.audio("music");
+        for(name in sounds.keys()) {
+            sounds[name] = game.add.audio(name);
+        }
     }
 
     static public function playSound(name) {
@@ -27,7 +37,7 @@ class AudioManager {
         if(music != null) {
             music.stop();
         }
-        sounds[name].play('', 0, 1, true);
+        sounds[name].play('', 0, 0.5, true);
         music = sounds[name];
     }
 }

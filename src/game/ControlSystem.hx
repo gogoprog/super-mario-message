@@ -30,6 +30,7 @@ class ControlSystem extends ash.core.System {
         var list = engine.getNodeList(BlockNode);
         for(node in list) {
             blockSprites.push(node.sprite);
+            untyped node.sprite.entity = node.entity;
         }
         untyped playerSprite.body.onWorldBounds = untyped __js__("new Phaser.Signal()");
         untyped playerSprite.body.onWorldBounds.add(hitWorldBounds, this);
@@ -74,6 +75,7 @@ class ControlSystem extends ash.core.System {
                     canJump = false;
                     jumping = true;
                     playerSprite.animations.play('jump', 15, true);
+                    AudioManager.playSound("jump");
                 }
             }
             if(jumping) {
@@ -103,6 +105,13 @@ class ControlSystem extends ash.core.System {
         if(a == playerSprite) {
             if(untyped a.body.touching.down && untyped b.body.touching.up) {
                 resetJump();
+            }
+            if(untyped a.body.touching.up && untyped b.body.touching.down) {
+                var e:Entity = untyped b.entity;
+                if(e.get(Shake) == null) {
+                    e.add(new Shake());
+                    AudioManager.playSound("bump");
+                }
             }
         }
     }

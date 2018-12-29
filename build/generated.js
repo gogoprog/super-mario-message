@@ -6,6 +6,15 @@ function $extend(from, fields) {
 	if( fields.toString !== Object.prototype.toString ) proto.toString = fields.toString;
 	return proto;
 }
+var HxOverrides = function() { };
+HxOverrides.__name__ = ["HxOverrides"];
+HxOverrides.iter = function(a) {
+	return { cur : 0, arr : a, hasNext : function() {
+		return this.cur < this.arr.length;
+	}, next : function() {
+		return this.arr[this.cur++];
+	}};
+};
 Math.__name__ = ["Math"];
 var Reflect = function() { };
 Reflect.__name__ = ["Reflect"];
@@ -1243,17 +1252,25 @@ ash_tools_ListIteratingSystem.prototype = $extend(ash_core_System.prototype,{
 var game_AudioManager = function() { };
 game_AudioManager.__name__ = ["game","AudioManager"];
 game_AudioManager.preload = function(game1) {
-	game1.load.audio("music","../data/audio/overworld.ogg");
+	var name = game_AudioManager.sounds.keys();
+	while(name.hasNext()) {
+		var name1 = name.next();
+		game1.load.audio(name1,"../data/audio/" + name1 + ".ogg");
+	}
 };
 game_AudioManager.init = function(game1) {
-	var this1 = game_AudioManager.sounds;
-	var v = game1.add.audio("music");
-	var _this = this1;
-	var value = v;
-	if(__map_reserved["music"] != null) {
-		_this.setReserved("music",value);
-	} else {
-		_this.h["music"] = value;
+	var name = game_AudioManager.sounds.keys();
+	while(name.hasNext()) {
+		var name1 = name.next();
+		var this1 = game_AudioManager.sounds;
+		var v = game1.add.audio(name1);
+		var _this = this1;
+		var value = v;
+		if(__map_reserved[name1] != null) {
+			_this.setReserved(name1,value);
+		} else {
+			_this.h[name1] = value;
+		}
 	}
 };
 game_AudioManager.playSound = function(name) {
@@ -1274,7 +1291,7 @@ game_AudioManager.playMusic = function(name) {
 		game_AudioManager.music.stop();
 	}
 	var _this1 = game_AudioManager.sounds;
-	(__map_reserved[name] != null ? _this1.getReserved(name) : _this1.h[name]).play("",0,1,true);
+	(__map_reserved[name] != null ? _this1.getReserved(name) : _this1.h[name]).play("",0,0.5,true);
 	var _this2 = game_AudioManager.sounds;
 	game_AudioManager.music = __map_reserved[name] != null ? _this2.getReserved(name) : _this2.h[name];
 };
@@ -1351,6 +1368,7 @@ game_ControlSystem.prototype = $extend(ash_core_System.prototype,{
 			_g_current = _g_current.next;
 			var node1 = node;
 			this.blockSprites.push(node1.sprite);
+			node1.sprite.entity = node1.entity;
 		}
 		this.playerSprite.body.onWorldBounds = new Phaser.Signal();
 		this.playerSprite.body.onWorldBounds.add($bind(this,this.hitWorldBounds),this);
@@ -1393,6 +1411,7 @@ game_ControlSystem.prototype = $extend(ash_core_System.prototype,{
 					this.canJump = false;
 					this.jumping = true;
 					this.playerSprite.animations.play("jump",15,true);
+					game_AudioManager.playSound("jump");
 				}
 			}
 			if(this.jumping) {
@@ -1426,6 +1445,13 @@ game_ControlSystem.prototype = $extend(ash_core_System.prototype,{
 		if(a == this.playerSprite) {
 			if(a.body.touching.down && b.body.touching.up) {
 				this.resetJump();
+			}
+			if(a.body.touching.up && b.body.touching.down) {
+				var e = b.entity;
+				if(e.get(game_Shake) == null) {
+					e.add(new game_Shake());
+					game_AudioManager.playSound("bump");
+				}
 			}
 		}
 	}
@@ -1601,7 +1627,7 @@ game_Game.prototype = {
 		this.engine.addEntity(e1);
 		var e2 = game_Factory.createPlayer();
 		this.engine.addEntity(e2);
-		var es = game_Factory.createBlocks($global.window.message || "debugging\nsession");
+		var es = game_Factory.createBlocks($global.window.message || "debugging\n[session]");
 		var _g = 0;
 		while(_g < es.length) {
 			var e3 = es[_g];
@@ -1611,7 +1637,7 @@ game_Game.prototype = {
 		this.engine.addSystem(new game_QuestionSystem(),1);
 		this.engine.addSystem(new game_ShakeSystem(),1);
 		this.engine.addSystem(new game_ControlSystem(),2);
-		game_AudioManager.playMusic("music");
+		game_AudioManager.playMusic("overworld");
 	}
 	,update: function() {
 		var dt = whiplash_Lib.getDeltaTime() / 1000;
@@ -1729,9 +1755,14 @@ game_QuestionSystem.prototype = $extend(ash_tools_ListIteratingSystem.prototype,
 				var e = b.entity;
 				if(e.get(game_Shake) == null) {
 					e.add(new game_Shake());
+					if(e.get(whiplash_phaser_BitmapText) == null) {
+						b.animations.play("block");
+						e.add(e.get(game_QuestionBlock).bt);
+						game_AudioManager.playSound("coin");
+					} else {
+						game_AudioManager.playSound("bump");
+					}
 				}
-				b.animations.play("block");
-				e.add(e.get(game_QuestionBlock).bt);
 			}
 		}
 	}
@@ -1924,6 +1955,9 @@ haxe_ds_StringMap.prototype = {
 			delete(this.h[key]);
 			return true;
 		}
+	}
+	,keys: function() {
+		return HxOverrides.iter(this.arrayKeys());
 	}
 	,arrayKeys: function() {
 		var out = [];
@@ -3147,7 +3181,37 @@ var Class = { __name__ : ["Class"]};
 var Enum = { };
 var __map_reserved = {};
 ash_core_Entity.nameCount = 0;
-game_AudioManager.sounds = new haxe_ds_StringMap();
+game_AudioManager.sounds = (function($this) {
+	var $r;
+	var _g = new haxe_ds_StringMap();
+	if(__map_reserved["overworld"] != null) {
+		_g.setReserved("overworld",null);
+	} else {
+		_g.h["overworld"] = null;
+	}
+	if(__map_reserved["jump"] != null) {
+		_g.setReserved("jump",null);
+	} else {
+		_g.h["jump"] = null;
+	}
+	if(__map_reserved["coin"] != null) {
+		_g.setReserved("coin",null);
+	} else {
+		_g.h["coin"] = null;
+	}
+	if(__map_reserved["1up"] != null) {
+		_g.setReserved("1up",null);
+	} else {
+		_g.h["1up"] = null;
+	}
+	if(__map_reserved["bump"] != null) {
+		_g.setReserved("bump",null);
+	} else {
+		_g.h["bump"] = null;
+	}
+	$r = _g;
+	return $r;
+}(this));
 game_Config.firstCol = 4;
 game_Config.firstRow = 6;
 game_Config.lineSpacing = 3;

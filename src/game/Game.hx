@@ -47,7 +47,7 @@ class Game {
         var e = Factory.createPlayer();
         engine.addEntity(e);
 
-        var es = Factory.createBlocks(untyped $global.window.message || "debugging\nsession");
+        var es = Factory.createBlocks(untyped $global.window.message || "debugging\n[session]");
         for(e in es) {
             engine.addEntity(e);
         }
@@ -56,7 +56,7 @@ class Game {
         engine.addSystem(new ShakeSystem(), 1);
         engine.addSystem(new ControlSystem(), 2);
 
-        AudioManager.playMusic("music");
+        AudioManager.playMusic("overworld");
     }
 
 

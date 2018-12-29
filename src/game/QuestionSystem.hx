@@ -58,10 +58,14 @@ class QuestionSystem extends ListIteratingSystem<QuestionNode> {
                 var e:Entity = untyped b.entity;
                 if(e.get(Shake) == null) {
                     e.add(new Shake());
+                    if(e.get(BitmapText) == null) {
+                        b.animations.play("block");
+                        e.add(e.get(QuestionBlock).bt);
+                        AudioManager.playSound("coin");
+                    } else {
+                        AudioManager.playSound("bump");
+                    }
                 }
-                b.animations.play("block");
-
-                e.add(e.get(QuestionBlock).bt);
             }
         }
     }
