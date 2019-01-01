@@ -117,7 +117,7 @@ class ControlSystem extends ash.core.System {
     }
 
     private function hitWorldBounds(player) {
-        if(player.body.position.y >= 195) {
+        if(player.body.position.y >= 192) {
             resetJump();
         }
     }

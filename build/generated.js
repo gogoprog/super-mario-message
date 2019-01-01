@@ -1456,7 +1456,7 @@ game_ControlSystem.prototype = $extend(ash_core_System.prototype,{
 		}
 	}
 	,hitWorldBounds: function(player) {
-		if(player.body.position.y >= 195) {
+		if(player.body.position.y >= 192) {
 			this.resetJump();
 		}
 	}
@@ -1617,7 +1617,7 @@ game_Game.prototype = {
 		game_AudioManager.init(game1);
 		game_Factory.init(game1);
 		whiplash_Input.setup(window.document.querySelector(".hud"));
-		game1.world.setBounds(0,0,760,210);
+		game1.world.setBounds(0,0,760,207);
 		game1.physics.startSystem(Phaser.Physics.ARCADE);
 		game1.time.desiredFps = 60;
 		game1.physics.arcade.gravity.y = 800;
