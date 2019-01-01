@@ -15,8 +15,7 @@
   <br/>
   <input type="button" class="go" value="Go!" />
   <hr/>
-  <textarea rows="4" cols="80" class="result" readonly>
-</textarea>
+    <a class="result" target="_blank"></a>
 </body>
 <script>
   $(function() {
@@ -36,7 +35,8 @@
       var url = window.location.href;
       url = url.substring(0, url.lastIndexOf("/"));
 
-      $(".result").val(url + "/?" + encodedData);
+      $(".result").text(url + "/?" + encodedData);
+      $(".result").attr("href", url + "/?" + encodedData);
 
     });
   });
