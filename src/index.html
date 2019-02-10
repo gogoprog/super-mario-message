@@ -5,17 +5,33 @@
   <meta charset="utf-8" />
   <title>super mario message</title>
   <script src="../deps/jquery-3.3.1.min.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      width: 500px;
+      margin: auto;
+    }
   </style>
 </head>
 
 <body>
-  <textarea rows="4" cols="80" class="message">
-</textarea>
-  <br/>
-  <input type="button" class="go" value="Go!" />
+  <h1>SMM</h1>
+  <small class="form-text text-muted">super-mario-message</small>
   <hr/>
-    <a class="result" target="_blank"></a>
+  <div class="form-group">
+    <textarea class="form-control message" rows="4" cols="80" placeholder="Enter your message here"></textarea>
+  </div>
+  <button class="go btn btn-primary">Generate link</button>
+  <div class="resultContainer" style="display:none;">
+    <hr/>
+    <div class="form-group">
+      <label>Generated link:</label>
+      <br/>
+      <a class="result" target="_blank"></a>
+    </div>
+  </div>
 </body>
 <script>
   $(function() {
@@ -37,6 +53,7 @@
 
       $(".result").text(url + "/?" + encodedData);
       $(".result").attr("href", url + "/?" + encodedData);
+      $(".resultContainer").show();
 
     });
   });
