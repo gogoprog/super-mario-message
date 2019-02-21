@@ -84,6 +84,8 @@
     $(function() {
       var params = window.location.search.substring(1);
 
+      params = params.split("&")[0];
+
       if (params.length > 3) {
         window.message = window.atob(params);
       }
