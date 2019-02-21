@@ -2378,27 +2378,37 @@ whiplash_Input.setup = function(element) {
 		whiplash_Input.mouseCoordinates.x = e.offsetX;
 		whiplash_Input.mouseCoordinates.y = e.offsetY;
 	});
-	element.addEventListener("mousemove",function(e1) {
-		whiplash_Input.mouseCoordinates.x = e1.offsetX;
-		whiplash_Input.mouseCoordinates.y = e1.offsetY;
+	element.addEventListener("touchstart",function(e1) {
+		whiplash_Input.mouseButtons.h[0] = true;
 	});
-	element.addEventListener("mouseup",function(e2) {
-		whiplash_Input.mouseButtons.h[e2.button] = false;
-		whiplash_Input.mouseCoordinates.x = e2.offsetX;
-		whiplash_Input.mouseCoordinates.y = e2.offsetY;
+	element.addEventListener("touchmove",function(e2) {
+		whiplash_Input.mouseCoordinates.x = e2.touches[0].clientX;
+		whiplash_Input.mouseCoordinates.y = e2.touches[0].clientY;
 	});
-	element.addEventListener("wheel",function(e3) {
-		whiplash_Input.mouseWheelDelta = e3.deltaY;
+	element.addEventListener("touchend",function(e3) {
+		whiplash_Input.mouseButtons.h[0] = false;
 	});
-	window.addEventListener("keydown",function(e4) {
-		var k = e4.key;
+	element.addEventListener("mousemove",function(e4) {
+		whiplash_Input.mouseCoordinates.x = e4.offsetX;
+		whiplash_Input.mouseCoordinates.y = e4.offsetY;
+	});
+	element.addEventListener("mouseup",function(e5) {
+		whiplash_Input.mouseButtons.h[e5.button] = false;
+		whiplash_Input.mouseCoordinates.x = e5.offsetX;
+		whiplash_Input.mouseCoordinates.y = e5.offsetY;
+	});
+	element.addEventListener("wheel",function(e6) {
+		whiplash_Input.mouseWheelDelta = e6.deltaY;
+	});
+	window.addEventListener("keydown",function(e7) {
+		var k = e7.key;
 		var _this = whiplash_Input.keys;
 		if(__map_reserved[k] != null) {
 			_this.setReserved(k,true);
 		} else {
 			_this.h[k] = true;
 		}
-		var k1 = e4.key;
+		var k1 = e7.key;
 		var _this1 = whiplash_Input.justPressedKeys;
 		if(__map_reserved[k1] != null) {
 			_this1.setReserved(k1,true);
@@ -2406,8 +2416,8 @@ whiplash_Input.setup = function(element) {
 			_this1.h[k1] = true;
 		}
 	});
-	window.addEventListener("keyup",function(e5) {
-		var k2 = e5.key;
+	window.addEventListener("keyup",function(e8) {
+		var k2 = e8.key;
 		var _this2 = whiplash_Input.keys;
 		if(__map_reserved[k2] != null) {
 			_this2.setReserved(k2,false);
