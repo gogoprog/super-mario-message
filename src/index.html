@@ -6,12 +6,17 @@
   <title>super mario message</title>
   <script src="../deps/jquery-3.3.1.min.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <style>
     body {
       font-family: 'Open Sans', sans-serif;
       width: 500px;
       margin: auto;
+    }
+
+    textarea {
+      font-family: 'Inconsolata';
     }
   </style>
 </head>
@@ -21,7 +26,7 @@
   <small class="form-text text-muted">super-mario-message</small>
   <hr/>
   <div class="form-group">
-    <textarea class="form-control message" rows="4" cols="80" placeholder="Enter your message here"></textarea>
+    <textarea class="form-control message" rows="4" cols="80" placeholder="Enter your message here. Use [brackets] for secret words!"></textarea>
   </div>
   <button class="go btn btn-primary">Generate link</button>
   <div class="resultContainer" style="display:none;">
