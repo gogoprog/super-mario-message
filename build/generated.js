@@ -1346,6 +1346,7 @@ game_BlockNode.prototype = $extend(ash_core_Node.prototype,{
 	__class__: game_BlockNode
 });
 var game_ControlSystem = function() {
+	this.lastMx = 100;
 	this.jumpTime = 0;
 	this.jumping = false;
 	this.wasNotPressed = false;
@@ -1383,6 +1384,11 @@ game_ControlSystem.prototype = $extend(ash_core_System.prototype,{
 			var mouseCoords = whiplash_Input.mouseCoordinates;
 			var mx = this.phaserGame.camera.x + mouseCoords.x * 320 / $("canvas").width();
 			var px = this.playerSprite.position.x;
+			if(!whiplash_Input.mouseButtons.h[0]) {
+				mx = this.lastMx;
+			} else {
+				this.lastMx = mx;
+			}
 			var dx = Math.abs(px - mx);
 			var dir = px > mx ? -1 : 1;
 			var playerBody = this.playerSprite.body;

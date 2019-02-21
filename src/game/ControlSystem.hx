@@ -18,6 +18,7 @@ class ControlSystem extends ash.core.System {
     private var wasNotPressed:Bool = false;
     private var jumping:Bool = false;
     private var jumpTime:Float = 0;
+    private var lastMx:Float = 100;
 
     public function new() {
         super();
@@ -47,6 +48,11 @@ class ControlSystem extends ash.core.System {
             var mouseCoords = whiplash.Input.mouseCoordinates;
             var mx = phaserGame.camera.x + mouseCoords.x * 320 / untyped $('canvas').width();
             var px = playerSprite.position.x;
+            if(!whiplash.Input.mouseButtons[0]) {
+                mx = lastMx;
+            } else {
+                lastMx = mx;
+            }
             var dx = Math.abs(px - mx);
             var dir = px > mx ? -1 : 1;
             var playerBody = playerSprite.body;
