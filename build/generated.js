@@ -1620,6 +1620,7 @@ game_Game.prototype = {
 	,create: function() {
 		var game1 = whiplash_Lib.phaserGame;
 		game1.stage.smoothed = false;
+		game1.stage.disableVisibilityChange = true;
 		game_AudioManager.init(game1);
 		game_Factory.init(game1);
 		whiplash_Input.setup(window.document.querySelector(".hud"));
@@ -1644,6 +1645,7 @@ game_Game.prototype = {
 		this.engine.addSystem(new game_ShakeSystem(),1);
 		this.engine.addSystem(new game_ControlSystem(),2);
 		game_AudioManager.playMusic("overworld");
+		$global.resizeCanvas();
 	}
 	,update: function() {
 		var dt = whiplash_Lib.getDeltaTime() / 1000;

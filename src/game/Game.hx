@@ -32,6 +32,7 @@ class Game {
     function create():Void {
         var game = whiplash.Lib.phaserGame;
         game.stage.smoothed = false;
+        game.stage.disableVisibilityChange = true;
         AudioManager.init(game);
         Factory.init(game);
         whiplash.Input.setup(document.querySelector(".hud"));
@@ -57,6 +58,8 @@ class Game {
         engine.addSystem(new ControlSystem(), 2);
 
         AudioManager.playMusic("overworld");
+
+        untyped $global.resizeCanvas();
     }
 
 

@@ -32,7 +32,6 @@
       image-rendering: crisp-edges;
       image-rendering: pixelated;
       -ms-interpolation-mode: nearest-neighbor;
-      zoom: 2;
     }
 
     .root>div {
@@ -51,12 +50,44 @@
     </div>
   </div>
   <script>
+    function resizeCanvas(e) {
+      var rw = 640;
+      var rh = 480;
+
+      var wh = window.innerHeight;
+      var ww = window.innerWidth;
+
+      var rwh = rw / rh;
+      var rhw = rh / rw;
+
+      var cw = 0;
+      var ch = 0;
+
+      var yourCanvas = document.getElementsByTagName("canvas")[0];
+
+      if (wh * rwh < ww) {
+        ch = wh;
+        cw = wh * rwh;
+      } else {
+        ch = ww * rhw;
+        cw = ww;
+      }
+
+      yourCanvas.style.width = cw + "px";
+      yourCanvas.style.height = ch + "px";
+    }
+
+    function delayResizeCanvas() {
+      window.setTimeout(resizeCanvas, 500);
+    }
+    window.addEventListener('resize', delayResizeCanvas);
     $(function() {
       var params = window.location.search.substring(1);
 
       if (params.length > 3) {
         window.message = window.atob(params);
       }
+      resizeCanvas();
     });
   </script>
   <script src="../build/generated.js"></script>
