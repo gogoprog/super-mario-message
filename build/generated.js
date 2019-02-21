@@ -2394,6 +2394,8 @@ whiplash_Input.setup = function(element) {
 	});
 	element.addEventListener("touchstart",function(e1) {
 		whiplash_Input.mouseButtons.h[0] = true;
+		whiplash_Input.mouseCoordinates.x = e1.touches[0].clientX;
+		whiplash_Input.mouseCoordinates.y = e1.touches[0].clientY;
 	});
 	element.addEventListener("touchmove",function(e2) {
 		whiplash_Input.mouseCoordinates.x = e2.touches[0].clientX;
@@ -2401,6 +2403,8 @@ whiplash_Input.setup = function(element) {
 	});
 	element.addEventListener("touchend",function(e3) {
 		whiplash_Input.mouseButtons.h[0] = false;
+		whiplash_Input.mouseCoordinates.x = e3.touches[0].clientX;
+		whiplash_Input.mouseCoordinates.y = e3.touches[0].clientY;
 	});
 	element.addEventListener("mousemove",function(e4) {
 		whiplash_Input.mouseCoordinates.x = e4.offsetX;
