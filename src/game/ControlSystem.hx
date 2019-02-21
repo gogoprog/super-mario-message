@@ -15,6 +15,7 @@ class ControlSystem extends ash.core.System {
     private var blockSprites:Array<Sprite> = [];
     private var mouseEnabled:Bool = true;
     private var canJump:Bool = false;
+    private var wasNotPressed:Bool = false;
     private var jumping:Bool = false;
     private var jumpTime:Float = 0;
 
@@ -71,11 +72,16 @@ class ControlSystem extends ash.core.System {
             playerEntity.get(Transform).scale.x = dir;
             if(canJump && vy == 0) {
                 if(whiplash.Input.mouseButtons[0]) {
-                    untyped playerBody.velocity.y = Config.jumpVelocity;
-                    canJump = false;
-                    jumping = true;
-                    playerSprite.animations.play('jump', 15, true);
-                    AudioManager.playSound("jump");
+                    if(wasNotPressed) {
+                        untyped playerBody.velocity.y = Config.jumpVelocity;
+                        canJump = false;
+                        jumping = true;
+                        playerSprite.animations.play('jump', 15, true);
+                        AudioManager.playSound("jump");
+                        wasNotPressed = false;
+                    }
+                } else {
+                    wasNotPressed = true;
                 }
             }
             if(jumping) {
@@ -91,7 +97,6 @@ class ControlSystem extends ash.core.System {
             untyped playerSprite.body.velocity.y = -200;
         }
     }
-
     public function render() {
         if(whiplash.Input.keys["F2"]) {
             phaserGame.debug.body(playerSprite);
@@ -100,7 +105,6 @@ class ControlSystem extends ash.core.System {
             }
         }
     }
-
     private function onCollide(a, b) {
         if(a == playerSprite) {
             if(untyped a.body.touching.down && untyped b.body.touching.up) {
@@ -115,13 +119,11 @@ class ControlSystem extends ash.core.System {
             }
         }
     }
-
     private function hitWorldBounds(player) {
         if(player.body.position.y >= 192) {
             resetJump();
         }
     }
-
     public function resetJump() {
         jumpTime = 0;
         canJump = true;

@@ -1348,6 +1348,7 @@ game_BlockNode.prototype = $extend(ash_core_Node.prototype,{
 var game_ControlSystem = function() {
 	this.jumpTime = 0;
 	this.jumping = false;
+	this.wasNotPressed = false;
 	this.canJump = false;
 	this.mouseEnabled = true;
 	this.blockSprites = [];
@@ -1407,11 +1408,16 @@ game_ControlSystem.prototype = $extend(ash_core_System.prototype,{
 			this.playerEntity.get(whiplash_phaser_Transform).scale.x = dir;
 			if(this.canJump && vy == 0) {
 				if(whiplash_Input.mouseButtons.h[0]) {
-					playerBody.velocity.y = game_Config.jumpVelocity;
-					this.canJump = false;
-					this.jumping = true;
-					this.playerSprite.animations.play("jump",15,true);
-					game_AudioManager.playSound("jump");
+					if(this.wasNotPressed) {
+						playerBody.velocity.y = game_Config.jumpVelocity;
+						this.canJump = false;
+						this.jumping = true;
+						this.playerSprite.animations.play("jump",15,true);
+						game_AudioManager.playSound("jump");
+						this.wasNotPressed = false;
+					}
+				} else {
+					this.wasNotPressed = true;
 				}
 			}
 			if(this.jumping) {
