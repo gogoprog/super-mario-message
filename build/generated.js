@@ -1381,7 +1381,7 @@ game_ControlSystem.prototype = $extend(ash_core_System.prototype,{
 		this.phaserGame.physics.arcade.collide(this.playerSprite,this.blockSprites,$bind(this,this.onCollide));
 		if(this.mouseEnabled) {
 			var mouseCoords = whiplash_Input.mouseCoordinates;
-			var mx = this.phaserGame.camera.x + mouseCoords.x * 0.5;
+			var mx = this.phaserGame.camera.x + mouseCoords.x * 320 / $("canvas").width();
 			var px = this.playerSprite.position.x;
 			var dx = Math.abs(px - mx);
 			var dir = px > mx ? -1 : 1;

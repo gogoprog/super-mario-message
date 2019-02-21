@@ -45,7 +45,7 @@ class ControlSystem extends ash.core.System {
         phaserGame.physics.arcade.collide(playerSprite, blockSprites, onCollide);
         if(mouseEnabled) {
             var mouseCoords = whiplash.Input.mouseCoordinates;
-            var mx = phaserGame.camera.x + mouseCoords.x * 0.5;
+            var mx = phaserGame.camera.x + mouseCoords.x * 320 / untyped $('canvas').width();
             var px = playerSprite.position.x;
             var dx = Math.abs(px - mx);
             var dir = px > mx ? -1 : 1;
