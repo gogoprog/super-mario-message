@@ -51,6 +51,12 @@
   </div>
   <script>
     function resizeCanvas(e) {
+      var yourCanvas = document.getElementsByTagName("canvas")[0];
+
+      if (!yourCanvas) {
+        return;
+      }
+
       var rw = 320;
       var rh = 240;
 
@@ -63,7 +69,6 @@
       var cw = 0;
       var ch = 0;
 
-      var yourCanvas = document.getElementsByTagName("canvas")[0];
 
       if (wh * rwh < ww) {
         ch = wh;
